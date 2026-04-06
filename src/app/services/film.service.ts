@@ -1,3 +1,5 @@
+import { apiFetch, parseJsonSafely } from './http.client';
+
 // Film Service - Movie catalog and search
 
 export interface Movie {
@@ -13,6 +15,34 @@ export interface Movie {
   duration: number;
   popularity: number;
   cast: string[];
+}
+
+interface FilmDetailDto {
+  id: string;
+  title: string;
+  description: string;
+  releaseYear: number;
+  producingCountry: string;
+  rating: string;
+  poster: string;
+}
+
+interface FilmDetailResponseDto {
+  data?: FilmDetailDto;
+  meta?: {
+    request_id?: string;
+    timestamp?: string;
+  };
+}
+
+export interface FilmDetail {
+  id: string;
+  title: string;
+  description: string;
+  releaseYear: number;
+  producingCountry: string;
+  rating: string;
+  poster: string;
 }
 
 export interface SearchFilters {
@@ -224,6 +254,18 @@ const MOCK_MOVIES: Movie[] = [
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+function mapFilmDetail(item: FilmDetailDto): FilmDetail {
+  return {
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    releaseYear: item.releaseYear,
+    producingCountry: item.producingCountry,
+    rating: item.rating,
+    poster: item.poster,
+  };
+}
+
 export const filmService = {
   async searchMovies(filters: SearchFilters = {}): Promise<Movie[]> {
     await delay(400);
@@ -279,6 +321,38 @@ export const filmService = {
   async getMovieById(id: string): Promise<Movie | null> {
     await delay(300);
     return MOCK_MOVIES.find(movie => movie.id === id) || null;
+  },
+
+  async getFilmById(id: string): Promise<FilmDetail | null> {
+    const normalizedId = id.trim();
+
+    if (!normalizedId) {
+      return null;
+    }
+
+    const response = await apiFetch(`/api/catalog/films/${normalizedId}`, {
+      method: 'GET',
+      auth: 'required',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const payload = await parseJsonSafely(response) as FilmDetailResponseDto | null;
+
+    if (!response.ok) {
+      const errorMessage =
+        (payload as any)?.message ??
+        (payload as any)?.error ??
+        `Film detail failed with status ${response.status}`;
+      throw new Error(errorMessage);
+    }
+
+    if (!payload?.data?.id) {
+      return null;
+    }
+
+    return mapFilmDetail(payload.data);
   },
 
   async getFeaturedMovies(): Promise<Movie[]> {
