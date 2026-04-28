@@ -381,7 +381,7 @@ export function AddRelease() {
         </div>
 
         <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(44,47,58,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(20,20,20,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
             <div className="space-y-5">
               <div>
                 <h2 className="text-xl font-semibold">1. Search the film</h2>
@@ -412,7 +412,7 @@ export function AddRelease() {
                 </div>
 
                 {isOpen && (query.trim().length >= 2 || error) && (
-                  <div className="absolute z-30 mt-2 max-h-96 w-full overflow-hidden rounded-2xl border border-border bg-popover shadow-[0_24px_60px_rgba(44,47,58,0.16)] dark:shadow-[0_28px_70px_rgba(0,0,0,0.34)]">
+                  <div className="absolute z-30 mt-2 max-h-96 w-full overflow-hidden rounded-2xl border border-border bg-popover shadow-[0_24px_60px_rgba(20,20,20,0.16)] dark:shadow-[0_28px_70px_rgba(0,0,0,0.34)]">
                     <div className="max-h-96 overflow-y-auto p-2">
                       {error ? (
                         <div className="rounded-xl px-4 py-6 text-sm text-destructive">{error}</div>
@@ -461,7 +461,7 @@ export function AddRelease() {
             </div>
           </section>
 
-          <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(44,47,58,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
+          <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(20,20,20,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">2. Selected film</h2>
               {selectedMovie ? (
@@ -505,7 +505,7 @@ export function AddRelease() {
             </div>
           </section>
 
-          <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(44,47,58,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
+          <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(20,20,20,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold">3. Release metadata</h2>

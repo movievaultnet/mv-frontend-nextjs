@@ -113,8 +113,8 @@ export function Home() {
       <Navbar />
       <div className="min-h-screen bg-background">
         {/* Hero Section */}
-        <div className="relative overflow-hidden border-b border-border bg-[linear-gradient(135deg,rgba(200,181,154,0.28),rgba(251,248,242,0.96)_45%,rgba(242,238,231,1))] dark:bg-[linear-gradient(135deg,rgba(200,181,154,0.12),rgba(23,27,34,0.98)_45%,rgba(14,17,22,1))]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(107,111,122,0.12),transparent_42%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(200,181,154,0.1),transparent_40%)]" />
+        <div className="relative overflow-hidden border-b border-border bg-[linear-gradient(135deg,rgba(191,163,122,0.28),rgba(246,239,228,0.96)_45%,rgba(239,230,216,1))] dark:bg-[linear-gradient(135deg,rgba(191,163,122,0.12),rgba(38,38,38,0.98)_45%,rgba(20,20,20,1))]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(138,129,120,0.12),transparent_42%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(191,163,122,0.1),transparent_40%)]" />
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary">
@@ -253,7 +253,7 @@ export function Home() {
 
             <Link 
               to="/ranking" 
-              className="group relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(135deg,rgba(200,181,154,0.28),rgba(107,111,122,0.08))] p-8 transition-all hover:border-accent/60 hover:shadow-xl hover:shadow-primary/10 dark:bg-[linear-gradient(135deg,rgba(200,181,154,0.12),rgba(107,111,122,0.12))]"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(135deg,rgba(191,163,122,0.28),rgba(138,129,120,0.08))] p-8 transition-all hover:border-accent/60 hover:shadow-xl hover:shadow-primary/10 dark:bg-[linear-gradient(135deg,rgba(191,163,122,0.12),rgba(138,129,120,0.12))]"
             >
               <div className="relative z-10">
                 <TrendingUp className="mb-4 h-12 w-12 text-accent" />

@@ -19,7 +19,7 @@ function RatingPill({ rating }: { rating: number }) {
 
 function PublicMovieTile({ movie }: { movie: LandingMovie }) {
   return (
-    <article className="group overflow-hidden rounded-[1.65rem] border border-border/80 bg-card/95 transition-all hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-[0_24px_60px_rgba(44,47,58,0.12)] dark:hover:shadow-[0_28px_70px_rgba(0,0,0,0.35)]">
+    <article className="group overflow-hidden rounded-[1.65rem] border border-border/80 bg-card/95 transition-all hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-[0_24px_60px_rgba(20,20,20,0.12)] dark:hover:shadow-[0_28px_70px_rgba(0,0,0,0.35)]">
       <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
         <ImageWithFallback
           src={movie.posterUrl}
@@ -195,8 +195,8 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="relative overflow-hidden border-b border-border bg-[radial-gradient(circle_at_top_left,rgba(200,181,154,0.34),transparent_28%),radial-gradient(circle_at_82%_14%,rgba(107,111,122,0.14),transparent_22%),linear-gradient(180deg,rgba(255,251,244,0.96),rgba(242,238,231,0.98))] dark:bg-[radial-gradient(circle_at_top_left,rgba(200,181,154,0.14),transparent_26%),radial-gradient(circle_at_82%_14%,rgba(107,111,122,0.12),transparent_22%),linear-gradient(180deg,rgba(23,27,34,0.98),rgba(14,17,22,1))]">
-        <div className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(44,47,58,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(44,47,58,0.06)_1px,transparent_1px)] [background-size:36px_36px] dark:opacity-20 dark:[background-image:linear-gradient(rgba(242,238,231,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(242,238,231,0.06)_1px,transparent_1px)]" />
+      <div className="relative overflow-hidden border-b border-border bg-[radial-gradient(circle_at_top_left,rgba(191,163,122,0.34),transparent_28%),radial-gradient(circle_at_82%_14%,rgba(138,129,120,0.14),transparent_22%),linear-gradient(180deg,rgba(251,245,236,0.96),rgba(239,230,216,0.98))] dark:bg-[radial-gradient(circle_at_top_left,rgba(191,163,122,0.14),transparent_26%),radial-gradient(circle_at_82%_14%,rgba(138,129,120,0.12),transparent_22%),linear-gradient(180deg,rgba(38,38,38,0.98),rgba(20,20,20,1))]">
+        <div className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(20,20,20,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(20,20,20,0.06)_1px,transparent_1px)] [background-size:36px_36px] dark:opacity-20 dark:[background-image:linear-gradient(rgba(239,230,216,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(239,230,216,0.06)_1px,transparent_1px)]" />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
         
         <Navbar variant="hero" />

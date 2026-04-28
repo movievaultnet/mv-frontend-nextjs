@@ -1,22 +1,22 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { PassThrough } from "node:stream";
 import { createReadableStreamFromReadable } from "@react-router/node";
-import { ServerRouter, UNSAFE_withComponentProps, Outlet, Meta, Links, ScrollRestoration, Scripts, Link, useNavigate, Navigate, useParams, useLocation } from "react-router";
+import { ServerRouter, Link, UNSAFE_withComponentProps, Outlet, Meta, Links, ScrollRestoration, Scripts, useNavigate, useLocation, useLoaderData, Navigate, useSearchParams, useParams } from "react-router";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import { useTheme } from "next-themes";
-import { Toaster as Toaster$1 } from "sonner";
-import * as React from "react";
-import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, ArrowRight, Loader2, Film, Sparkles, TrendingUp, Clapperboard, Play, Star, CheckCircle2, Trophy, Settings as Settings$1, LogOut, Clock, Tag, Brain, Search, X, Calendar, Package2, ScanLine, Filter, ChevronDownIcon, CheckIcon, ChevronUpIcon, PlusCircle, Upload, ImagePlus, XIcon, ShieldCheck, ImageIcon, Check, Plus, Globe, BadgeCheck, User, Pencil, Trash2, Library, ExternalLink, TrendingDown, Minus, Lock, Award, Mail, XCircle, Shield } from "lucide-react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva } from "class-variance-authority";
+import { ThemeProvider as ThemeProvider$1, useTheme } from "next-themes";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import useEmblaCarousel from "embla-carousel-react";
-import * as LabelPrimitive from "@radix-ui/react-label";
+import { Toaster as Toaster$1 } from "sonner";
+import { Sun, Moon, Monitor, Check, Search, Library, Brain, Clapperboard, Settings as Settings$1, LogOut, ArrowRight, Star, Loader2, CheckCircle2, Sparkles, Clock, Tag, ArrowLeft, TrendingUp, Film, X, Calendar, Package2, ScanLine, Filter, ChevronDownIcon, CheckIcon, ChevronUpIcon, PlusCircle, Upload, ImagePlus, XIcon, ShieldCheck, Plus, ImageIcon, Globe, BadgeCheck, User, Pencil, Trash2, TrendingDown, Minus, Lock, Trophy, Award, Mail, XCircle, Shield, ExternalLink } from "lucide-react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva } from "class-variance-authority";
+import * as React from "react";
+import { useState, useEffect, useRef } from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
+import * as LabelPrimitive from "@radix-ui/react-label";
+import useEmblaCarousel from "embla-carousel-react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -78,140 +78,24 @@ const entryServer = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
   default: handleRequest,
   streamTimeout
 }, Symbol.toStringTag, { value: "Module" }));
-const Toaster = ({ ...props }) => {
-  const { theme = "system" } = useTheme();
+function ThemeProvider({ children }) {
   return /* @__PURE__ */ jsx(
-    Toaster$1,
+    ThemeProvider$1,
     {
-      theme,
-      className: "toaster group",
-      style: {
-        "--normal-bg": "var(--popover)",
-        "--normal-text": "var(--popover-foreground)",
-        "--normal-border": "var(--border)"
-      },
-      ...props
+      attribute: "class",
+      storageKey: "movievault-theme",
+      defaultTheme: "system",
+      themes: ["light", "dark", "system"],
+      enableSystem: true,
+      enableColorScheme: true,
+      disableTransitionOnChange: true,
+      children
     }
   );
-};
-function Layout({
-  children
-}) {
-  return /* @__PURE__ */ jsxs("html", {
-    lang: "en",
-    children: [/* @__PURE__ */ jsxs("head", {
-      children: [/* @__PURE__ */ jsx("meta", {
-        charSet: "UTF-8"
-      }), /* @__PURE__ */ jsx("meta", {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1.0"
-      }), /* @__PURE__ */ jsx(Meta, {}), /* @__PURE__ */ jsx(Links, {})]
-    }), /* @__PURE__ */ jsxs("body", {
-      children: [children, /* @__PURE__ */ jsx(ScrollRestoration, {}), /* @__PURE__ */ jsx(Scripts, {})]
-    })]
-  });
 }
-const root = UNSAFE_withComponentProps(function App() {
-  return /* @__PURE__ */ jsxs(Fragment, {
-    children: [/* @__PURE__ */ jsx(Outlet, {}), /* @__PURE__ */ jsx(Toaster, {})]
-  });
-});
-const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  Layout,
-  default: root
-}, Symbol.toStringTag, { value: "Module" }));
-const parseJsonSafely = void 0;
+const parseJsonSafely$1 = void 0;
 const apiFetch = void 0;
 const refreshAccessToken = void 0;
-const DISCOVER_FILMS_ENDPOINT = "/api/catalog/films/tmdb/discover";
-const TMDB_IMAGE_BASE_URL$1 = "https://image.tmdb.org/t/p/w500";
-const DEFAULT_DISCOVER_REQUEST = {
-  includeAdult: false,
-  includeVideo: false,
-  language: "en-US",
-  page: 1,
-  sortBy: "popularity.desc"
-};
-function mapPosterUrl(posterPath) {
-  return posterPath ? `${TMDB_IMAGE_BASE_URL$1}${posterPath}` : "";
-}
-function mapLandingMovie(movie) {
-  return {
-    id: String(movie.id),
-    title: movie.title,
-    synopsis: movie.overview,
-    posterUrl: mapPosterUrl(movie.poster_path),
-    releaseDate: movie.release_date,
-    releaseYear: movie.release_date ? movie.release_date.slice(0, 4) : "TBA",
-    rating: movie.vote_average,
-    trailerKey: movie.trailer_key
-  };
-}
-async function fetchDiscoverFilms(request = DEFAULT_DISCOVER_REQUEST) {
-  var _a;
-  const response = await apiFetch(DISCOVER_FILMS_ENDPOINT, {
-    method: "POST",
-    auth: "none",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(request)
-  });
-  const payload = await parseJsonSafely(response);
-  if (!response.ok) {
-    const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Discover request failed with status ${response.status}`;
-    throw new Error(errorMessage);
-  }
-  if (!((_a = payload == null ? void 0 : payload.data) == null ? void 0 : _a.results)) {
-    throw new Error("Invalid discover response");
-  }
-  return payload;
-}
-const landingService = {
-  async getDiscoverMovies(request = {}) {
-    const payload = await fetchDiscoverFilms({
-      ...DEFAULT_DISCOVER_REQUEST,
-      ...request
-    });
-    return payload.data.results.map(mapLandingMovie);
-  },
-  async getLandingPayload() {
-    const payload = await fetchDiscoverFilms(DEFAULT_DISCOVER_REQUEST);
-    const movies = payload.data.results.map(mapLandingMovie);
-    const averageRating = movies.reduce((acc, movie) => acc + movie.rating, 0) / Math.max(movies.length, 1);
-    return {
-      heroMovies: movies.slice(0, 4),
-      spotlightMovies: movies.slice(0, 2),
-      collections: [
-        {
-          id: "discover-grid",
-          title: "Discover Feed",
-          description: "The first page of the TMDB discover feed, sorted by popularity.",
-          movies: movies.slice(0, 6)
-        },
-        {
-          id: "fresh-picks",
-          title: "Fresh Picks",
-          description: "A tighter subset for the editorial part of the landing.",
-          movies: movies.slice(2, 6)
-        },
-        {
-          id: "worth-a-look",
-          title: "Worth A Look",
-          description: "Additional titles surfaced from the same discover request.",
-          movies: movies.slice(6, 10)
-        }
-      ],
-      stats: {
-        currentPage: payload.data.page,
-        totalPages: payload.data.total_pages,
-        totalResults: payload.data.total_results.toLocaleString("en-US"),
-        averageRating: averageRating.toFixed(1)
-      }
-    };
-  }
-};
 const TOKEN_KEY = "movievault_token";
 const USER_KEY = "movievault_user";
 const SIGNED_OUT_KEY = "movievault_signed_out";
@@ -357,7 +241,7 @@ const authService = {
     } catch {
       throw new Error("Unable to reach auth service");
     }
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok) {
       const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? (payload == null ? void 0 : payload.details) ?? `Login failed with status ${response.status}`;
       throw new Error(errorMessage);
@@ -419,6 +303,135 @@ const authService = {
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
+const logoDark = "/assets/logo-mv-dark-BS8xkOIG.png";
+const logoClear = "/assets/logo-mv-clear-fn8P2G3o.png";
+function BrandLogo({ className, alt = "MovieVault", ...props }) {
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(
+      "img",
+      {
+        src: logoDark,
+        alt,
+        className: cn("block dark:hidden", className),
+        ...props
+      }
+    ),
+    /* @__PURE__ */ jsx(
+      "img",
+      {
+        src: logoClear,
+        alt,
+        className: cn("hidden dark:block", className),
+        ...props
+      }
+    )
+  ] });
+}
+function Footer() {
+  const user = authService.getCurrentUser();
+  const year = (/* @__PURE__ */ new Date()).getFullYear();
+  return /* @__PURE__ */ jsx("footer", { className: "border-t border-border bg-card/70 backdrop-blur supports-[backdrop-filter]:bg-card/60", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8", children: [
+    /* @__PURE__ */ jsxs("div", { className: "grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_0.8fr_0.8fr]", children: [
+      /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsx(Link, { to: user ? "/home" : "/", className: "inline-flex items-center transition-opacity hover:opacity-90", children: /* @__PURE__ */ jsx(
+          BrandLogo,
+          {
+            className: "h-[40px] w-auto object-contain sm:h-[44px]"
+          }
+        ) }),
+        /* @__PURE__ */ jsx("p", { className: "max-w-md text-sm leading-6 text-muted-foreground", children: "Physical movie collecting, release discovery, and collection tracking in one place." })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsx("h2", { className: "text-sm font-semibold uppercase tracking-[0.22em] text-foreground/80", children: "Explore" }),
+        /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-2 text-sm text-muted-foreground", children: [
+          /* @__PURE__ */ jsx(Link, { to: user ? "/catalog" : "/", className: "transition-colors hover:text-foreground", children: "Catalog" }),
+          /* @__PURE__ */ jsx(Link, { to: "/ai-content", className: "transition-colors hover:text-foreground", children: "Reviews" }),
+          /* @__PURE__ */ jsx(Link, { to: user ? "/ranking" : "/", className: "transition-colors hover:text-foreground", children: "Leaderboard" })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsx("h2", { className: "text-sm font-semibold uppercase tracking-[0.22em] text-foreground/80", children: "Account" }),
+        /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-2 text-sm text-muted-foreground", children: user ? /* @__PURE__ */ jsxs(Fragment, { children: [
+          /* @__PURE__ */ jsx(Link, { to: "/home", className: "transition-colors hover:text-foreground", children: "Dashboard" }),
+          /* @__PURE__ */ jsx(Link, { to: "/collection", className: "transition-colors hover:text-foreground", children: "My Collection" }),
+          /* @__PURE__ */ jsx(Link, { to: "/settings", className: "transition-colors hover:text-foreground", children: "Settings" })
+        ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+          /* @__PURE__ */ jsx(Link, { to: "/login", className: "transition-colors hover:text-foreground", children: "Sign in" }),
+          /* @__PURE__ */ jsx(Link, { to: "/register", className: "transition-colors hover:text-foreground", children: "Create account" })
+        ] }) })
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxs("div", { className: "mt-8 flex flex-col gap-3 border-t border-border/80 pt-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between", children: [
+      /* @__PURE__ */ jsx("p", { children: `(c) ${year} MovieVault. All rights reserved.` }),
+      /* @__PURE__ */ jsx("p", { children: "TMDB discovery and metadata power parts of the catalog experience." })
+    ] })
+  ] }) });
+}
+const Toaster = ({ ...props }) => {
+  const { theme = "system" } = useTheme();
+  return /* @__PURE__ */ jsx(
+    Toaster$1,
+    {
+      theme,
+      className: "toaster group",
+      style: {
+        "--normal-bg": "var(--popover)",
+        "--normal-text": "var(--popover-foreground)",
+        "--normal-border": "var(--border)"
+      },
+      ...props
+    }
+  );
+};
+function Layout({
+  children
+}) {
+  return /* @__PURE__ */ jsxs("html", {
+    lang: "en",
+    suppressHydrationWarning: true,
+    children: [/* @__PURE__ */ jsxs("head", {
+      children: [/* @__PURE__ */ jsx("meta", {
+        charSet: "UTF-8"
+      }), /* @__PURE__ */ jsx("meta", {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1.0"
+      }), /* @__PURE__ */ jsx("title", {
+        children: "MovieVault: Your physical film release database"
+      }), /* @__PURE__ */ jsx("meta", {
+        name: "description",
+        content: "MovieVault is a database and collection space for physical film editions. Discover releases, track formats, and manage your personal cinema archive."
+      }), /* @__PURE__ */ jsx(Meta, {}), /* @__PURE__ */ jsx(Links, {})]
+    }), /* @__PURE__ */ jsxs("body", {
+      children: [/* @__PURE__ */ jsx(ThemeProvider, {
+        children
+      }), /* @__PURE__ */ jsx(ScrollRestoration, {}), /* @__PURE__ */ jsx(Scripts, {})]
+    })]
+  });
+}
+const root = UNSAFE_withComponentProps(function App() {
+  return /* @__PURE__ */ jsxs(Fragment, {
+    children: [/* @__PURE__ */ jsx(Outlet, {}), /* @__PURE__ */ jsx(Footer, {}), /* @__PURE__ */ jsx(Toaster, {})]
+  });
+});
+const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  Layout,
+  default: root
+}, Symbol.toStringTag, { value: "Module" }));
+function getApiBaseUrl() {
+  if (typeof window === "undefined") {
+    return "http://mv-gateway";
+  }
+  const { protocol, hostname, port, origin } = window.location;
+  if ((hostname === "localhost" || hostname === "127.0.0.1") && port === "5173") {
+    return `${protocol}//${hostname}`;
+  }
+  return origin;
+}
+function buildApiUrl(path) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${getApiBaseUrl()}${normalizedPath}`;
+}
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
@@ -461,188 +474,381 @@ function Button({
     }
   );
 }
-const CarouselContext = React.createContext(null);
-function useCarousel() {
-  const context = React.useContext(CarouselContext);
-  if (!context) {
-    throw new Error("useCarousel must be used within a <Carousel />");
-  }
-  return context;
-}
-function Carousel({
-  orientation = "horizontal",
-  opts,
-  setApi,
-  plugins,
-  className,
-  children,
+function DropdownMenu({
   ...props
 }) {
-  const [carouselRef, api] = useEmblaCarousel(
-    {
-      ...opts,
-      axis: orientation === "horizontal" ? "x" : "y"
-    },
-    plugins
-  );
-  const [canScrollPrev, setCanScrollPrev] = React.useState(false);
-  const [canScrollNext, setCanScrollNext] = React.useState(false);
-  const onSelect = React.useCallback((api2) => {
-    if (!api2) return;
-    setCanScrollPrev(api2.canScrollPrev());
-    setCanScrollNext(api2.canScrollNext());
-  }, []);
-  const scrollPrev = React.useCallback(() => {
-    api == null ? void 0 : api.scrollPrev();
-  }, [api]);
-  const scrollNext = React.useCallback(() => {
-    api == null ? void 0 : api.scrollNext();
-  }, [api]);
-  const handleKeyDown = React.useCallback(
-    (event) => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        scrollPrev();
-      } else if (event.key === "ArrowRight") {
-        event.preventDefault();
-        scrollNext();
-      }
-    },
-    [scrollPrev, scrollNext]
-  );
-  React.useEffect(() => {
-    if (!api || !setApi) return;
-    setApi(api);
-  }, [api, setApi]);
-  React.useEffect(() => {
-    if (!api) return;
-    onSelect(api);
-    api.on("reInit", onSelect);
-    api.on("select", onSelect);
-    return () => {
-      api == null ? void 0 : api.off("select", onSelect);
-    };
-  }, [api, onSelect]);
+  return /* @__PURE__ */ jsx(DropdownMenuPrimitive.Root, { "data-slot": "dropdown-menu", ...props });
+}
+function DropdownMenuTrigger({
+  ...props
+}) {
   return /* @__PURE__ */ jsx(
-    CarouselContext.Provider,
+    DropdownMenuPrimitive.Trigger,
     {
-      value: {
-        carouselRef,
-        api,
-        opts,
-        orientation: orientation || ((opts == null ? void 0 : opts.axis) === "y" ? "vertical" : "horizontal"),
-        scrollPrev,
-        scrollNext,
-        canScrollPrev,
-        canScrollNext
-      },
-      children: /* @__PURE__ */ jsx(
-        "div",
-        {
-          onKeyDownCapture: handleKeyDown,
-          className: cn("relative", className),
-          role: "region",
-          "aria-roledescription": "carousel",
-          "data-slot": "carousel",
-          ...props,
-          children
-        }
-      )
+      "data-slot": "dropdown-menu-trigger",
+      ...props
     }
   );
 }
-function CarouselContent({ className, ...props }) {
-  const { carouselRef, orientation } = useCarousel();
-  return /* @__PURE__ */ jsx(
-    "div",
+function DropdownMenuContent({
+  className,
+  sideOffset = 4,
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(DropdownMenuPrimitive.Portal, { children: /* @__PURE__ */ jsx(
+    DropdownMenuPrimitive.Content,
     {
-      ref: carouselRef,
-      className: "overflow-hidden",
-      "data-slot": "carousel-content",
-      children: /* @__PURE__ */ jsx(
-        "div",
-        {
-          className: cn(
-            "flex",
-            orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
-            className
-          ),
-          ...props
-        }
-      )
-    }
-  );
-}
-function CarouselItem({ className, ...props }) {
-  const { orientation } = useCarousel();
-  return /* @__PURE__ */ jsx(
-    "div",
-    {
-      role: "group",
-      "aria-roledescription": "slide",
-      "data-slot": "carousel-item",
+      "data-slot": "dropdown-menu-content",
+      sideOffset,
       className: cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
-        orientation === "horizontal" ? "pl-4" : "pt-4",
+        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
+        className
+      ),
+      ...props
+    }
+  ) });
+}
+function DropdownMenuItem({
+  className,
+  inset,
+  variant = "default",
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(
+    DropdownMenuPrimitive.Item,
+    {
+      "data-slot": "dropdown-menu-item",
+      "data-inset": inset,
+      "data-variant": variant,
+      className: cn(
+        "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       ),
       ...props
     }
   );
 }
-function CarouselPrevious({
+function DropdownMenuSeparator({
   className,
-  variant = "outline",
-  size = "icon",
   ...props
 }) {
-  const { orientation, scrollPrev, canScrollPrev } = useCarousel();
-  return /* @__PURE__ */ jsxs(
-    Button,
+  return /* @__PURE__ */ jsx(
+    DropdownMenuPrimitive.Separator,
     {
-      "data-slot": "carousel-previous",
-      variant,
-      size,
-      className: cn(
-        "absolute size-8 rounded-full",
-        orientation === "horizontal" ? "top-1/2 -left-12 -translate-y-1/2" : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      ),
-      disabled: !canScrollPrev,
-      onClick: scrollPrev,
-      ...props,
-      children: [
-        /* @__PURE__ */ jsx(ArrowLeft, {}),
-        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Previous slide" })
-      ]
+      "data-slot": "dropdown-menu-separator",
+      className: cn("bg-border -mx-1 my-1 h-px", className),
+      ...props
     }
   );
 }
-function CarouselNext({
+function Avatar({
   className,
-  variant = "outline",
-  size = "icon",
   ...props
 }) {
-  const { orientation, scrollNext, canScrollNext } = useCarousel();
-  return /* @__PURE__ */ jsxs(
-    Button,
+  return /* @__PURE__ */ jsx(
+    AvatarPrimitive.Root,
     {
-      "data-slot": "carousel-next",
-      variant,
-      size,
+      "data-slot": "avatar",
       className: cn(
-        "absolute size-8 rounded-full",
-        orientation === "horizontal" ? "top-1/2 -right-12 -translate-y-1/2" : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
+        "relative flex size-10 shrink-0 overflow-hidden rounded-full",
         className
       ),
-      disabled: !canScrollNext,
-      onClick: scrollNext,
-      ...props,
-      children: [
-        /* @__PURE__ */ jsx(ArrowRight, {}),
-        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Next slide" })
-      ]
+      ...props
+    }
+  );
+}
+function AvatarImage({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(
+    AvatarPrimitive.Image,
+    {
+      "data-slot": "avatar-image",
+      className: cn("aspect-square size-full", className),
+      ...props
+    }
+  );
+}
+function AvatarFallback({
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(
+    AvatarPrimitive.Fallback,
+    {
+      "data-slot": "avatar-fallback",
+      className: cn(
+        "bg-muted flex size-full items-center justify-center rounded-full",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function Input({ className, type, ...props }) {
+  return /* @__PURE__ */ jsx(
+    "input",
+    {
+      type,
+      "data-slot": "input",
+      className: cn(
+        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        className
+      ),
+      ...props
+    }
+  );
+}
+const themeOptions = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor }
+];
+function ThemeModeToggle({
+  align = "end",
+  buttonClassName,
+  compact = false
+}) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const currentTheme = theme ?? "system";
+  const activeOption = themeOptions.find((option) => option.value === currentTheme) ?? themeOptions[2];
+  const ActiveIcon = activeOption.icon;
+  if (!mounted) {
+    return compact ? /* @__PURE__ */ jsx(
+      Button,
+      {
+        variant: "outline",
+        size: "icon",
+        className: cn("rounded-full border-border bg-background/70", buttonClassName),
+        children: /* @__PURE__ */ jsx(Monitor, { className: "h-4 w-4" })
+      }
+    ) : /* @__PURE__ */ jsx("div", { className: "flex items-center gap-2 rounded-full border border-border bg-secondary/30 p-1", children: themeOptions.map((option) => {
+      const OptionIcon = option.icon;
+      return /* @__PURE__ */ jsxs(Button, { type: "button", size: "sm", variant: "ghost", disabled: true, className: "rounded-full px-3.5", children: [
+        /* @__PURE__ */ jsx(OptionIcon, { className: "h-4 w-4" }),
+        /* @__PURE__ */ jsx("span", { children: option.label })
+      ] }, option.value);
+    }) });
+  }
+  if (!compact) {
+    return /* @__PURE__ */ jsx("div", { className: cn("flex items-center gap-2 rounded-full border border-border bg-secondary/30 p-1", buttonClassName), children: themeOptions.map((option) => {
+      const OptionIcon = option.icon;
+      const isActive = option.value === currentTheme;
+      return /* @__PURE__ */ jsxs(
+        Button,
+        {
+          type: "button",
+          size: "sm",
+          variant: isActive ? "default" : "ghost",
+          onClick: () => setTheme(option.value),
+          className: cn(
+            "rounded-full px-3.5",
+            !isActive && "text-muted-foreground hover:text-foreground"
+          ),
+          children: [
+            /* @__PURE__ */ jsx(OptionIcon, { className: "h-4 w-4" }),
+            /* @__PURE__ */ jsx("span", { children: option.label })
+          ]
+        },
+        option.value
+      );
+    }) });
+  }
+  return /* @__PURE__ */ jsxs(DropdownMenu, { children: [
+    /* @__PURE__ */ jsx(DropdownMenuTrigger, { asChild: true, children: /* @__PURE__ */ jsxs(
+      Button,
+      {
+        variant: "outline",
+        size: compact ? "icon" : "sm",
+        className: cn(
+          compact ? "rounded-full border-border bg-background/70" : "gap-2 rounded-full border-border bg-background/70 px-3.5",
+          buttonClassName
+        ),
+        children: [
+          /* @__PURE__ */ jsx(ActiveIcon, { className: "h-4 w-4" }),
+          !compact && /* @__PURE__ */ jsx("span", { children: activeOption.label })
+        ]
+      }
+    ) }),
+    /* @__PURE__ */ jsx(DropdownMenuContent, { align, className: "w-44 rounded-xl", children: themeOptions.map((option) => {
+      const OptionIcon = option.icon;
+      const isActive = option.value === currentTheme;
+      return /* @__PURE__ */ jsxs(DropdownMenuItem, { onSelect: () => setTheme(option.value), children: [
+        /* @__PURE__ */ jsx(OptionIcon, { className: "h-4 w-4" }),
+        /* @__PURE__ */ jsx("span", { children: option.label }),
+        isActive ? /* @__PURE__ */ jsx(Check, { className: "ml-auto h-4 w-4 text-primary" }) : null
+      ] }, option.value);
+    }) })
+  ] });
+}
+function Navbar({ variant = "app" }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user = authService.getCurrentUser();
+  const [catalogQuery, setCatalogQuery] = useState("");
+  const isLoginPage = location.pathname === "/login";
+  const isRegisterPage = location.pathname === "/register";
+  const isResetPage = location.pathname === "/reset-password";
+  const handleLogout = () => {
+    authService.logout();
+    navigate("/login");
+  };
+  const handleCatalogSearchSubmit = (event) => {
+    event.preventDefault();
+    const normalizedQuery = catalogQuery.trim();
+    if (!normalizedQuery) {
+      navigate("/catalog");
+      return;
+    }
+    navigate(`/catalog?query=${encodeURIComponent(normalizedQuery)}`);
+  };
+  return /* @__PURE__ */ jsx(
+    "nav",
+    {
+      className: cn(
+        variant === "app" ? "sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80" : "relative z-50"
+      ),
+      children: /* @__PURE__ */ jsx(
+        "div",
+        {
+          className: cn(
+            "mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8",
+            variant === "app" ? "" : ""
+          ),
+          children: /* @__PURE__ */ jsxs("div", { className: "flex h-16 items-center gap-4", children: [
+            /* @__PURE__ */ jsx(Link, { to: user ? "/home" : "/", className: "flex items-center gap-2 shrink-0", children: /* @__PURE__ */ jsx(
+              BrandLogo,
+              {
+                className: "h-[38px] w-auto object-contain sm:h-[42px]"
+              }
+            ) }),
+            user && /* @__PURE__ */ jsx("div", { className: "hidden min-w-0 flex-1 md:flex md:justify-center", children: /* @__PURE__ */ jsx("form", { onSubmit: handleCatalogSearchSubmit, className: "w-full max-w-2xl", children: /* @__PURE__ */ jsxs("div", { className: "relative", children: [
+              /* @__PURE__ */ jsx(Search, { className: "pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" }),
+              /* @__PURE__ */ jsx(
+                Input,
+                {
+                  type: "search",
+                  value: catalogQuery,
+                  onChange: (event) => setCatalogQuery(event.target.value),
+                  placeholder: "Search releases, films, barcodes...",
+                  className: "h-11 rounded-full border-border bg-background/70 pl-11 pr-28 shadow-sm transition-colors focus-visible:ring-primary/20"
+                }
+              ),
+              /* @__PURE__ */ jsx(
+                "button",
+                {
+                  type: "submit",
+                  className: "absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90",
+                  children: "Search"
+                }
+              )
+            ] }) }) }),
+            user ? /* @__PURE__ */ jsxs("div", { className: "ml-auto flex shrink-0 items-center gap-3", children: [
+              /* @__PURE__ */ jsx(ThemeModeToggle, { compact: true }),
+              /* @__PURE__ */ jsxs(DropdownMenu, { children: [
+                /* @__PURE__ */ jsx(DropdownMenuTrigger, { className: "focus:outline-none", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 rounded-full border border-border bg-secondary/50 py-1.5 pl-1.5 pr-4 transition-colors hover:bg-secondary", children: [
+                  /* @__PURE__ */ jsxs(Avatar, { className: "h-8 w-8", children: [
+                    /* @__PURE__ */ jsx(AvatarImage, { src: user.avatar, alt: user.name }),
+                    /* @__PURE__ */ jsx(AvatarFallback, { children: user.name.charAt(0) })
+                  ] }),
+                  /* @__PURE__ */ jsxs("div", { className: "hidden sm:flex flex-col items-start", children: [
+                    /* @__PURE__ */ jsx("span", { className: "text-sm font-medium leading-none", children: user.name }),
+                    /* @__PURE__ */ jsx("span", { className: "text-xs text-muted-foreground", children: user.role })
+                  ] })
+                ] }) }),
+                /* @__PURE__ */ jsxs(DropdownMenuContent, { align: "end", className: "w-56", children: [
+                  /* @__PURE__ */ jsxs("div", { className: "px-2 py-1.5", children: [
+                    /* @__PURE__ */ jsx("p", { className: "text-sm font-medium", children: user.name }),
+                    /* @__PURE__ */ jsx("p", { className: "text-xs text-muted-foreground", children: user.email })
+                  ] }),
+                  /* @__PURE__ */ jsx(DropdownMenuSeparator, {}),
+                  /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: () => navigate("/catalog"), children: [
+                    /* @__PURE__ */ jsx(Search, { className: "mr-2 h-4 w-4" }),
+                    /* @__PURE__ */ jsx("span", { children: "Catalog" })
+                  ] }),
+                  /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: () => navigate("/collection"), children: [
+                    /* @__PURE__ */ jsx(Library, { className: "mr-2 h-4 w-4" }),
+                    /* @__PURE__ */ jsx("span", { children: "My Collection" })
+                  ] }),
+                  /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: () => navigate("/ai-content"), children: [
+                    /* @__PURE__ */ jsx(Brain, { className: "mr-2 h-4 w-4" }),
+                    /* @__PURE__ */ jsx("span", { children: "Reviews" })
+                  ] }),
+                  /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: () => navigate("/ranking"), children: [
+                    /* @__PURE__ */ jsx(Clapperboard, { className: "mr-2 h-4 w-4" }),
+                    /* @__PURE__ */ jsx("span", { children: "Leaderboard" })
+                  ] }),
+                  /* @__PURE__ */ jsx(DropdownMenuSeparator, {}),
+                  /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: () => navigate("/settings"), children: [
+                    /* @__PURE__ */ jsx(Settings$1, { className: "mr-2 h-4 w-4" }),
+                    /* @__PURE__ */ jsx("span", { children: "Settings" })
+                  ] }),
+                  /* @__PURE__ */ jsx(DropdownMenuSeparator, {}),
+                  /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: handleLogout, children: [
+                    /* @__PURE__ */ jsx(LogOut, { className: "mr-2 h-4 w-4" }),
+                    /* @__PURE__ */ jsx("span", { children: "Logout" })
+                  ] })
+                ] })
+              ] })
+            ] }) : /* @__PURE__ */ jsxs("div", { className: "ml-auto flex shrink-0 items-center gap-3", children: [
+              /* @__PURE__ */ jsx(ThemeModeToggle, { compact: true }),
+              /* @__PURE__ */ jsx(
+                Link,
+                {
+                  to: "/ai-content",
+                  className: "mr-2 hidden text-sm font-medium text-foreground transition-colors hover:text-primary md:inline-flex",
+                  children: "Reviews"
+                }
+              ),
+              !isLoginPage && !isResetPage && variant !== "hero" && /* @__PURE__ */ jsx(
+                Link,
+                {
+                  to: "/login",
+                  className: "hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex",
+                  children: "Sign in"
+                }
+              ),
+              (isLoginPage || isRegisterPage || isResetPage) && /* @__PURE__ */ jsx(
+                Link,
+                {
+                  to: "/",
+                  className: "hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex",
+                  children: "Home"
+                }
+              ),
+              variant === "hero" ? /* @__PURE__ */ jsx(
+                Link,
+                {
+                  to: "/login",
+                  className: "inline-flex items-center rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-opacity hover:opacity-90",
+                  children: "Sign in"
+                }
+              ) : !isRegisterPage ? /* @__PURE__ */ jsx(
+                Link,
+                {
+                  to: "/register",
+                  className: "inline-flex items-center rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-opacity hover:opacity-90",
+                  children: "Create account"
+                }
+              ) : /* @__PURE__ */ jsx(
+                Link,
+                {
+                  to: "/login",
+                  className: "inline-flex items-center rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-opacity hover:opacity-90",
+                  children: "Sign in"
+                }
+              )
+            ] })
+          ] })
+        }
+      )
     }
   );
 }
@@ -698,9 +904,9 @@ function RatingPill({
   rating
 }) {
   return /* @__PURE__ */ jsxs("div", {
-    className: "inline-flex items-center gap-1 rounded-full bg-black/70 px-2.5 py-1 text-xs text-white backdrop-blur",
+    className: "inline-flex items-center gap-1 rounded-full border border-border/70 bg-card/90 px-2.5 py-1 text-xs text-foreground shadow-sm backdrop-blur",
     children: [/* @__PURE__ */ jsx(Star, {
-      className: "h-3 w-3 fill-yellow-400 text-yellow-400"
+      className: "h-3 w-3 fill-accent text-accent"
     }), rating.toFixed(1)]
   });
 }
@@ -708,7 +914,7 @@ function PublicMovieTile({
   movie
 }) {
   return /* @__PURE__ */ jsxs("article", {
-    className: "group overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10",
+    className: "group overflow-hidden rounded-[1.65rem] border border-border/80 bg-card/95 transition-all hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-[0_24px_60px_rgba(20,20,20,0.12)] dark:hover:shadow-[0_28px_70px_rgba(0,0,0,0.35)]",
     children: [/* @__PURE__ */ jsxs("div", {
       className: "relative aspect-[3/4] overflow-hidden bg-secondary",
       children: [/* @__PURE__ */ jsx(ImageWithFallback, {
@@ -737,6 +943,34 @@ function PublicMovieTile({
       })]
     })]
   });
+}
+function getReleaseTimestamp$1(movie) {
+  if (!movie.releaseDate) {
+    return 0;
+  }
+  const parsedDate = new Date(movie.releaseDate);
+  return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
+}
+function buildLandingCollections$1(movies) {
+  const freshPicks = [...movies].sort((left, right) => getReleaseTimestamp$1(right) - getReleaseTimestamp$1(left) || right.rating - left.rating).slice(0, 4);
+  const freshPickIds = new Set(freshPicks.map((movie) => movie.id));
+  const worthALook = [...movies].filter((movie) => !freshPickIds.has(movie.id)).sort((left, right) => right.rating - left.rating || getReleaseTimestamp$1(right) - getReleaseTimestamp$1(left)).slice(0, 4);
+  return [{
+    id: "discover-grid",
+    title: "Discover Feed",
+    description: "A broad look at the films currently surfacing in discovery.",
+    movies: movies.slice(0, 6)
+  }, {
+    id: "fresh-picks",
+    title: "Fresh Picks",
+    description: "Recent titles worth keeping an eye on.",
+    movies: freshPicks
+  }, {
+    id: "worth-a-look",
+    title: "Worth A Look",
+    description: "Standout films selected for their strong reception.",
+    movies: worthALook
+  }];
 }
 function CollectionStrip({
   collection,
@@ -776,35 +1010,63 @@ function CollectionStrip({
     })]
   });
 }
-function Landing() {
-  const isAuthenticated = authService.isAuthenticated();
-  const [payload, setPayload] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-  useEffect(() => {
-    const loadLanding = async () => {
-      try {
-        const data = await landingService.getLandingPayload();
-        setPayload(data);
-        setHasError(false);
-      } catch (error) {
-        console.error("Failed to load landing payload:", error);
-        setHasError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadLanding();
-  }, []);
-  if (loading) {
-    return /* @__PURE__ */ jsx("div", {
-      className: "flex min-h-screen items-center justify-center bg-background",
-      children: /* @__PURE__ */ jsx(Loader2, {
-        className: "h-8 w-8 animate-spin text-primary"
+const loader = async () => {
+  try {
+    const DISCOVER_FILMS_ENDPOINT2 = "/api/catalog/films/tmdb/discover";
+    const TMDB_IMAGE_BASE_URL2 = "https://image.tmdb.org/t/p/w500";
+    const response = await fetch(buildApiUrl(DISCOVER_FILMS_ENDPOINT2), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        includeAdult: false,
+        includeVideo: false,
+        language: "en-US",
+        page: 1,
+        sortBy: "popularity.desc"
       })
     });
+    if (!response.ok) {
+      throw new Error(`Discover request failed with status ${response.status}`);
+    }
+    const payloadRaw = await response.json();
+    const results = payloadRaw.data.results;
+    const mapLandingMovie2 = (movie) => ({
+      id: String(movie.id),
+      title: movie.title,
+      synopsis: movie.overview,
+      posterUrl: movie.poster_path ? `${TMDB_IMAGE_BASE_URL2}${movie.poster_path}` : "",
+      releaseDate: movie.release_date,
+      releaseYear: movie.release_date ? movie.release_date.slice(0, 4) : "TBA",
+      rating: movie.vote_average,
+      trailerKey: movie.trailer_key
+    });
+    const movies = results.map(mapLandingMovie2);
+    const payload = {
+      heroMovies: movies.slice(0, 4),
+      spotlightMovies: movies.slice(0, 2),
+      collections: buildLandingCollections$1(movies)
+    };
+    return {
+      payload,
+      error: null
+    };
+  } catch (error) {
+    console.error("Failed to load landing payload:", error);
+    return {
+      payload: null,
+      error: "Failed to load landing payload"
+    };
   }
-  if (hasError || !payload) {
+};
+const Landing = UNSAFE_withComponentProps(function Landing2() {
+  const {
+    payload,
+    error: loaderError
+  } = useLoaderData();
+  const isAuthenticated = authService.isAuthenticated();
+  if (loaderError || !payload) {
     return /* @__PURE__ */ jsx("div", {
       className: "flex min-h-screen items-center justify-center bg-background px-4",
       children: /* @__PURE__ */ jsxs("div", {
@@ -814,7 +1076,7 @@ function Landing() {
           children: "Landing unavailable"
         }), /* @__PURE__ */ jsx("p", {
           className: "mt-3 text-muted-foreground",
-          children: "The TMDB discover feed could not be loaded from the backend. Try refreshing or open the app directly."
+          children: "This page could not be loaded right now. Try refreshing or open the app directly."
         }), /* @__PURE__ */ jsxs("div", {
           className: "mt-6 flex justify-center gap-3",
           children: [/* @__PURE__ */ jsx(Button, {
@@ -838,67 +1100,38 @@ function Landing() {
   return /* @__PURE__ */ jsxs("div", {
     className: "min-h-screen bg-background text-foreground",
     children: [/* @__PURE__ */ jsxs("div", {
-      className: "relative overflow-hidden border-b border-border bg-[radial-gradient(circle_at_top_left,rgba(193,18,31,0.22),transparent_30%),radial-gradient(circle_at_82%_14%,rgba(140,106,67,0.16),transparent_20%),linear-gradient(180deg,rgba(20,20,22,1),rgba(9,9,10,1))]",
+      className: "relative overflow-hidden border-b border-border bg-[radial-gradient(circle_at_top_left,rgba(191,163,122,0.34),transparent_28%),radial-gradient(circle_at_82%_14%,rgba(138,129,120,0.14),transparent_22%),linear-gradient(180deg,rgba(251,245,236,0.96),rgba(239,230,216,0.98))] dark:bg-[radial-gradient(circle_at_top_left,rgba(191,163,122,0.14),transparent_26%),radial-gradient(circle_at_82%_14%,rgba(138,129,120,0.12),transparent_22%),linear-gradient(180deg,rgba(38,38,38,0.98),rgba(20,20,20,1))]",
       children: [/* @__PURE__ */ jsx("div", {
-        className: "absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:36px_36px]"
-      }), /* @__PURE__ */ jsxs("header", {
-        className: "relative mx-auto flex max-w-7xl items-center justify-between px-4 py-6 sm:px-6 lg:px-8",
-        children: [/* @__PURE__ */ jsxs(Link, {
-          to: "/",
-          className: "flex items-center gap-3",
-          children: [/* @__PURE__ */ jsx("div", {
-            className: "flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25",
-            children: /* @__PURE__ */ jsx(Film, {
-              className: "h-6 w-6"
-            })
-          }), /* @__PURE__ */ jsxs("div", {
-            children: [/* @__PURE__ */ jsx("p", {
-              className: "text-lg font-semibold",
-              children: "MovieVault"
-            }), /* @__PURE__ */ jsx("p", {
-              className: "text-xs uppercase tracking-[0.24em] text-muted-foreground",
-              children: "Showcase Edition"
-            })]
-          })]
-        }), /* @__PURE__ */ jsxs("div", {
-          className: "flex items-center gap-3",
-          children: [/* @__PURE__ */ jsx(Button, {
-            asChild: true,
-            variant: "ghost",
-            className: "hidden sm:inline-flex",
-            children: /* @__PURE__ */ jsx(Link, {
-              to: isAuthenticated ? "/home" : "/login",
-              children: isAuthenticated ? "Open app" : "Sign in"
-            })
-          }), /* @__PURE__ */ jsx(Button, {
-            asChild: true,
-            className: "rounded-full px-5",
-            children: /* @__PURE__ */ jsx(Link, {
-              to: isAuthenticated ? "/home" : "/register",
-              children: isAuthenticated ? "Go to dashboard" : "Create account"
-            })
-          })]
-        })]
-      }), /* @__PURE__ */ jsxs("div", {
-        className: "relative mx-auto grid max-w-7xl gap-12 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pb-24 lg:pt-12",
-        children: [/* @__PURE__ */ jsxs("section", {
-          className: "space-y-8",
+        className: "absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(20,20,20,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(20,20,20,0.06)_1px,transparent_1px)] [background-size:36px_36px] dark:opacity-20 dark:[background-image:linear-gradient(rgba(239,230,216,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(239,230,216,0.06)_1px,transparent_1px)]"
+      }), /* @__PURE__ */ jsx("div", {
+        className: "absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent"
+      }), /* @__PURE__ */ jsx(Navbar, {
+        variant: "hero"
+      }), /* @__PURE__ */ jsx("div", {
+        className: "relative mx-auto max-w-7xl px-4 pb-16 pt-10 sm:px-6 lg:px-8 lg:pb-24 lg:pt-14",
+        children: /* @__PURE__ */ jsxs("section", {
+          className: "flex min-h-full flex-col justify-center space-y-8",
           children: [/* @__PURE__ */ jsxs("div", {
-            className: "inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm text-primary",
-            children: [/* @__PURE__ */ jsx(Sparkles, {
-              className: "h-4 w-4"
-            }), "Live landing powered by the backend TMDB discover endpoint"]
-          }), /* @__PURE__ */ jsxs("div", {
-            className: "space-y-5",
-            children: [/* @__PURE__ */ jsx("h1", {
-              className: "max-w-3xl text-5xl font-semibold tracking-tight sm:text-6xl",
-              children: "A storefront for cinema culture, now fed by real discover data."
-            }), /* @__PURE__ */ jsx("p", {
-              className: "max-w-2xl text-lg leading-8 text-muted-foreground",
-              children: "The homepage now surfaces live titles from the backend discover feed and translates them into a cleaner showcase before users enter the app."
+            className: "flex flex-wrap gap-2",
+            children: [/* @__PURE__ */ jsx(Badge, {
+              className: "rounded-full border border-accent/40 bg-accent/20 px-4 py-1.5 text-primary hover:bg-accent/20",
+              children: "Discover films"
+            }), /* @__PURE__ */ jsx(Badge, {
+              variant: "outline",
+              className: "rounded-full border-border bg-card/70 px-4 py-1.5 text-muted-foreground",
+              children: "Physical editions and collection tracking"
             })]
           }), /* @__PURE__ */ jsxs("div", {
-            className: "flex flex-wrap gap-3",
+            className: "space-y-6",
+            children: [/* @__PURE__ */ jsx("h1", {
+              className: "max-w-5xl text-5xl font-semibold tracking-[-0.04em] sm:text-6xl xl:text-7xl",
+              children: "Track, discover, and vault your favorite movies."
+            }), /* @__PURE__ */ jsx("p", {
+              className: "max-w-4xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9",
+              children: "Join a community of cinema enthusiasts. Our live discover feed brings you the latest titles, trending releases, and hidden gems so you're always in the loop."
+            })]
+          }), /* @__PURE__ */ jsxs("div", {
+            className: "flex flex-wrap gap-3 pt-1",
             children: [/* @__PURE__ */ jsx(Button, {
               asChild: true,
               size: "lg",
@@ -920,243 +1153,52 @@ function Landing() {
               })
             })]
           }), /* @__PURE__ */ jsxs("div", {
-            className: "grid gap-4 sm:grid-cols-4",
+            className: "grid gap-3 sm:grid-cols-3",
             children: [/* @__PURE__ */ jsxs("div", {
-              className: "rounded-2xl border border-border bg-card/70 p-5 backdrop-blur",
+              className: "rounded-2xl border border-border/80 bg-card/72 px-4 py-4 shadow-sm backdrop-blur",
               children: [/* @__PURE__ */ jsx("p", {
-                className: "text-sm text-muted-foreground",
-                children: "Current page"
+                className: "text-xs uppercase tracking-[0.22em] text-muted-foreground",
+                children: "Discover"
               }), /* @__PURE__ */ jsx("p", {
-                className: "mt-2 text-3xl font-bold",
-                children: payload.stats.currentPage
+                className: "mt-2 text-sm leading-6 text-foreground/82",
+                children: "Browse notable films and uncover new titles to track."
               })]
             }), /* @__PURE__ */ jsxs("div", {
-              className: "rounded-2xl border border-border bg-card/70 p-5 backdrop-blur",
+              className: "rounded-2xl border border-border/80 bg-card/72 px-4 py-4 shadow-sm backdrop-blur",
               children: [/* @__PURE__ */ jsx("p", {
-                className: "text-sm text-muted-foreground",
-                children: "Total pages"
+                className: "text-xs uppercase tracking-[0.22em] text-muted-foreground",
+                children: "Catalog"
               }), /* @__PURE__ */ jsx("p", {
-                className: "mt-2 text-3xl font-bold",
-                children: payload.stats.totalPages
+                className: "mt-2 text-sm leading-6 text-foreground/82",
+                children: "Search releases, inspect editions, and follow archive data."
               })]
             }), /* @__PURE__ */ jsxs("div", {
-              className: "rounded-2xl border border-border bg-card/70 p-5 backdrop-blur",
+              className: "rounded-2xl border border-border/80 bg-card/72 px-4 py-4 shadow-sm backdrop-blur",
               children: [/* @__PURE__ */ jsx("p", {
-                className: "text-sm text-muted-foreground",
-                children: "Total results"
+                className: "text-xs uppercase tracking-[0.22em] text-muted-foreground",
+                children: "Collect"
               }), /* @__PURE__ */ jsx("p", {
-                className: "mt-2 text-3xl font-bold",
-                children: payload.stats.totalResults
+                className: "mt-2 text-sm leading-6 text-foreground/82",
+                children: "Track physical items with condition, notes, and ownership details."
               })]
-            }), /* @__PURE__ */ jsxs("div", {
-              className: "rounded-2xl border border-border bg-card/70 p-5 backdrop-blur",
-              children: [/* @__PURE__ */ jsx("p", {
-                className: "text-sm text-muted-foreground",
-                children: "Avg. rating"
-              }), /* @__PURE__ */ jsx("p", {
-                className: "mt-2 text-3xl font-bold",
-                children: payload.stats.averageRating
-              })]
-            })]
-          })]
-        }), /* @__PURE__ */ jsxs("section", {
-          className: "relative rounded-[2rem] border border-border bg-card/70 p-4 shadow-2xl shadow-black/30 backdrop-blur sm:p-6",
-          children: [/* @__PURE__ */ jsxs("div", {
-            className: "mb-4 flex items-center justify-between gap-3",
-            children: [/* @__PURE__ */ jsxs("div", {
-              children: [/* @__PURE__ */ jsx("p", {
-                className: "text-sm uppercase tracking-[0.24em] text-primary",
-                children: "Featured Reel"
-              }), /* @__PURE__ */ jsx("h2", {
-                className: "text-2xl font-bold",
-                children: "Backend discover showcase"
-              })]
-            }), /* @__PURE__ */ jsxs("div", {
-              className: "hidden items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-1 text-xs text-muted-foreground sm:flex",
-              children: [/* @__PURE__ */ jsx(TrendingUp, {
-                className: "h-3.5 w-3.5 text-primary"
-              }), "Sorted by popularity.desc"]
-            })]
-          }), /* @__PURE__ */ jsxs(Carousel, {
-            className: "w-full",
-            children: [/* @__PURE__ */ jsx(CarouselContent, {
-              children: payload.heroMovies.map((movie) => /* @__PURE__ */ jsx(CarouselItem, {
-                children: /* @__PURE__ */ jsx("article", {
-                  className: "overflow-hidden rounded-[1.5rem] border border-border bg-secondary/30 p-5 sm:p-6",
-                  children: /* @__PURE__ */ jsxs("div", {
-                    className: "grid gap-6 md:grid-cols-[220px_1fr] md:items-center",
-                    children: [/* @__PURE__ */ jsx("div", {
-                      className: "overflow-hidden rounded-2xl border border-border bg-card",
-                      children: /* @__PURE__ */ jsxs("div", {
-                        className: "relative aspect-[3/4]",
-                        children: [/* @__PURE__ */ jsx(ImageWithFallback, {
-                          src: movie.posterUrl,
-                          alt: movie.title,
-                          className: "h-full w-full object-cover"
-                        }), /* @__PURE__ */ jsx("div", {
-                          className: "absolute right-4 top-4",
-                          children: /* @__PURE__ */ jsx(RatingPill, {
-                            rating: movie.rating
-                          })
-                        })]
-                      })
-                    }), /* @__PURE__ */ jsxs("div", {
-                      className: "space-y-5",
-                      children: [/* @__PURE__ */ jsxs("div", {
-                        className: "flex flex-wrap gap-2",
-                        children: [/* @__PURE__ */ jsx(Badge, {
-                          className: "rounded-full bg-primary/15 text-primary hover:bg-primary/15",
-                          children: "TMDB Discover"
-                        }), /* @__PURE__ */ jsxs(Badge, {
-                          variant: "outline",
-                          className: "rounded-full",
-                          children: ["Release ", movie.releaseYear]
-                        })]
-                      }), /* @__PURE__ */ jsxs("div", {
-                        children: [/* @__PURE__ */ jsx("h3", {
-                          className: "text-3xl font-bold sm:text-4xl",
-                          children: movie.title
-                        }), /* @__PURE__ */ jsx("p", {
-                          className: "mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base",
-                          children: movie.synopsis
-                        })]
-                      }), /* @__PURE__ */ jsxs("div", {
-                        className: "flex flex-wrap items-center gap-4 text-sm text-muted-foreground",
-                        children: [/* @__PURE__ */ jsxs("span", {
-                          children: ["Release date: ", movie.releaseDate || "TBA"]
-                        }), /* @__PURE__ */ jsxs("span", {
-                          children: ["TMDB score: ", movie.rating.toFixed(1)]
-                        })]
-                      }), /* @__PURE__ */ jsxs("div", {
-                        className: "flex flex-wrap gap-3",
-                        children: [/* @__PURE__ */ jsx(Button, {
-                          asChild: true,
-                          children: /* @__PURE__ */ jsx(Link, {
-                            to: isAuthenticated ? "/catalog" : "/login",
-                            children: isAuthenticated ? "Open catalog" : "Sign in to explore"
-                          })
-                        }), /* @__PURE__ */ jsx(Button, {
-                          asChild: true,
-                          variant: "outline",
-                          children: /* @__PURE__ */ jsx(Link, {
-                            to: isAuthenticated ? "/home" : "/register",
-                            children: isAuthenticated ? "Go to dashboard" : "Create account"
-                          })
-                        })]
-                      })]
-                    })]
-                  })
-                })
-              }, movie.id))
-            }), /* @__PURE__ */ jsx(CarouselPrevious, {
-              className: "left-4 top-4 translate-y-0 border-white/15 bg-black/50 text-white hover:bg-black/70 disabled:opacity-40"
-            }), /* @__PURE__ */ jsx(CarouselNext, {
-              className: "right-4 top-4 translate-y-0 border-white/15 bg-black/50 text-white hover:bg-black/70 disabled:opacity-40"
-            })]
-          })]
-        })]
-      })]
-    }), /* @__PURE__ */ jsxs("main", {
-      className: "mx-auto max-w-7xl space-y-20 px-4 py-14 sm:px-6 lg:px-8 lg:py-20",
-      children: [/* @__PURE__ */ jsxs("section", {
-        className: "grid gap-6 lg:grid-cols-[0.95fr_1.05fr]",
-        children: [/* @__PURE__ */ jsxs("div", {
-          className: "rounded-[2rem] border border-border bg-card p-7",
-          children: [/* @__PURE__ */ jsxs("div", {
-            className: "mb-6 flex items-center gap-3",
-            children: [/* @__PURE__ */ jsx("div", {
-              className: "rounded-2xl bg-primary/10 p-3 text-primary",
-              children: /* @__PURE__ */ jsx(Clapperboard, {
-                className: "h-6 w-6"
-              })
-            }), /* @__PURE__ */ jsxs("div", {
-              children: [/* @__PURE__ */ jsx("p", {
-                className: "text-sm uppercase tracking-[0.24em] text-primary",
-                children: "Spotlight"
-              }), /* @__PURE__ */ jsx("h2", {
-                className: "text-2xl font-bold",
-                children: "A tighter discover cut"
-              })]
-            })]
-          }), /* @__PURE__ */ jsx("p", {
-            className: "max-w-xl text-muted-foreground",
-            children: "The landing now uses the backend discover response directly and reshapes it into a public-facing showcase without inventing fields that the endpoint does not provide."
-          })]
-        }), /* @__PURE__ */ jsx("div", {
-          className: "grid gap-6 sm:grid-cols-2",
-          children: payload.spotlightMovies.map((movie) => /* @__PURE__ */ jsx(PublicMovieTile, {
-            movie
-          }, `spotlight-${movie.id}`))
-        })]
-      }), payload.collections.map((collection) => /* @__PURE__ */ jsx(CollectionStrip, {
-        collection,
-        isAuthenticated
-      }, collection.id)), /* @__PURE__ */ jsx("section", {
-        className: "rounded-[2rem] border border-border bg-gradient-to-br from-primary/10 via-card to-card p-8 sm:p-10",
-        children: /* @__PURE__ */ jsxs("div", {
-          className: "flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between",
-          children: [/* @__PURE__ */ jsxs("div", {
-            className: "max-w-2xl",
-            children: [/* @__PURE__ */ jsx("p", {
-              className: "text-sm uppercase tracking-[0.24em] text-primary",
-              children: "Ready to go further"
-            }), /* @__PURE__ */ jsx("h2", {
-              className: "mt-3 text-3xl font-bold sm:text-4xl",
-              children: "The entry page now reflects real backend content."
-            }), /* @__PURE__ */ jsx("p", {
-              className: "mt-4 text-lg text-muted-foreground",
-              children: "Login, catalog, rankings and collection management can now sit behind a landing that is backed by live discover results instead of local placeholder content."
-            })]
-          }), /* @__PURE__ */ jsxs("div", {
-            className: "flex flex-wrap gap-3",
-            children: [/* @__PURE__ */ jsx(Button, {
-              asChild: true,
-              size: "lg",
-              className: "rounded-full px-6",
-              children: /* @__PURE__ */ jsxs(Link, {
-                to: isAuthenticated ? "/home" : "/login",
-                children: [/* @__PURE__ */ jsx(Play, {
-                  className: "h-4 w-4"
-                }), isAuthenticated ? "Open the app" : "Enter MovieVault"]
-              })
-            }), /* @__PURE__ */ jsx(Button, {
-              asChild: true,
-              size: "lg",
-              variant: "outline",
-              className: "rounded-full px-6",
-              children: /* @__PURE__ */ jsx(Link, {
-                to: isAuthenticated ? "/ranking" : "/register",
-                children: "See what is inside"
-              })
             })]
           })]
         })
       })]
+    }), /* @__PURE__ */ jsx("main", {
+      className: "mx-auto max-w-7xl space-y-20 px-4 py-14 sm:px-6 lg:px-8 lg:py-20",
+      children: payload.collections.map((collection) => /* @__PURE__ */ jsx(CollectionStrip, {
+        collection,
+        isAuthenticated
+      }, collection.id))
     })]
   });
-}
-const Landing_default = UNSAFE_withComponentProps(Landing);
+});
 const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  Landing,
-  default: Landing_default
+  default: Landing,
+  loader
 }, Symbol.toStringTag, { value: "Module" }));
-function Input({ className, type, ...props }) {
-  return /* @__PURE__ */ jsx(
-    "input",
-    {
-      type,
-      "data-slot": "input",
-      className: cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className
-      ),
-      ...props
-    }
-  );
-}
 function Label({
   className,
   ...props
@@ -1198,18 +1240,16 @@ function Login() {
   return /* @__PURE__ */ jsxs("div", {
     className: "flex min-h-screen items-center justify-center p-4",
     children: [/* @__PURE__ */ jsx("div", {
-      className: "absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-background to-background"
+      className: "absolute inset-0 -z-10 bg-gradient-to-br from-accent/20 via-background to-background dark:from-accent/10"
     }), /* @__PURE__ */ jsx("div", {
-      className: "absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_20%,rgba(139,92,246,0.1),transparent_50%)]"
+      className: "absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_20%,rgba(191,163,122,0.28),transparent_40%),radial-gradient(circle_at_82%_16%,rgba(138,129,120,0.12),transparent_24%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(191,163,122,0.14),transparent_32%),radial-gradient(circle_at_82%_16%,rgba(138,129,120,0.1),transparent_22%)]"
     }), /* @__PURE__ */ jsxs("div", {
       className: "w-full max-w-md space-y-8",
-      children: [/* @__PURE__ */ jsxs("div", {
-        className: "flex flex-col items-center gap-4",
-        children: [/* @__PURE__ */ jsx("div", {
-          className: "flex h-16 w-16 items-center justify-center rounded-2xl bg-primary",
-          children: /* @__PURE__ */ jsx(Film, {
-            className: "h-10 w-10 text-primary-foreground"
-          })
+      children: [/* @__PURE__ */ jsxs(Link, {
+        to: "/",
+        className: "flex flex-col items-center gap-4 group transition-opacity hover:opacity-90",
+        children: [/* @__PURE__ */ jsx(BrandLogo, {
+          className: "h-[58px] w-auto object-contain transition-transform group-hover:scale-[1.02] sm:h-[64px]"
         }), /* @__PURE__ */ jsxs("div", {
           className: "text-center",
           children: [/* @__PURE__ */ jsx("h1", {
@@ -1221,7 +1261,7 @@ function Login() {
           })]
         })]
       }), /* @__PURE__ */ jsx("div", {
-        className: "rounded-2xl border border-border bg-card p-8 shadow-xl",
+        className: "rounded-[1.7rem] border border-border/80 bg-card/94 p-8 shadow-[0_24px_70px_rgba(20,20,20,0.12)] backdrop-blur dark:shadow-[0_26px_70px_rgba(0,0,0,0.34)]",
         children: /* @__PURE__ */ jsxs("form", {
           onSubmit: handleSubmit,
           className: "space-y-6",
@@ -1273,7 +1313,7 @@ function Login() {
               }), "Signing in..."]
             }) : "Sign in"
           }), /* @__PURE__ */ jsxs("div", {
-            className: "rounded-lg bg-primary/5 border border-primary/20 px-4 py-3 text-sm",
+            className: "rounded-lg border border-accent/40 bg-accent/14 px-4 py-3 text-sm",
             children: [/* @__PURE__ */ jsx("p", {
               className: "font-medium text-primary mb-1",
               children: "Example Credentials:"
@@ -1342,18 +1382,16 @@ function Register() {
   return /* @__PURE__ */ jsxs("div", {
     className: "flex min-h-screen items-center justify-center p-4",
     children: [/* @__PURE__ */ jsx("div", {
-      className: "absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-background to-background"
+      className: "absolute inset-0 -z-10 bg-gradient-to-br from-accent/20 via-background to-background dark:from-accent/10"
     }), /* @__PURE__ */ jsx("div", {
-      className: "absolute inset-0 -z-10 bg-[radial-gradient(circle_at_70%_80%,rgba(139,92,246,0.1),transparent_50%)]"
+      className: "absolute inset-0 -z-10 bg-[radial-gradient(circle_at_70%_80%,rgba(191,163,122,0.28),transparent_42%),radial-gradient(circle_at_18%_20%,rgba(138,129,120,0.12),transparent_24%)] dark:bg-[radial-gradient(circle_at_70%_80%,rgba(191,163,122,0.14),transparent_34%),radial-gradient(circle_at_18%_20%,rgba(138,129,120,0.1),transparent_22%)]"
     }), /* @__PURE__ */ jsxs("div", {
       className: "w-full max-w-md space-y-8",
-      children: [/* @__PURE__ */ jsxs("div", {
-        className: "flex flex-col items-center gap-4",
-        children: [/* @__PURE__ */ jsx("div", {
-          className: "flex h-16 w-16 items-center justify-center rounded-2xl bg-primary",
-          children: /* @__PURE__ */ jsx(Film, {
-            className: "h-10 w-10 text-primary-foreground"
-          })
+      children: [/* @__PURE__ */ jsxs(Link, {
+        to: "/",
+        className: "flex flex-col items-center gap-4 group transition-opacity hover:opacity-90",
+        children: [/* @__PURE__ */ jsx(BrandLogo, {
+          className: "h-[58px] w-auto object-contain transition-transform group-hover:scale-[1.02] sm:h-[64px]"
         }), /* @__PURE__ */ jsxs("div", {
           className: "text-center",
           children: [/* @__PURE__ */ jsx("h1", {
@@ -1365,7 +1403,7 @@ function Register() {
           })]
         })]
       }), /* @__PURE__ */ jsx("div", {
-        className: "rounded-2xl border border-border bg-card p-8 shadow-xl",
+        className: "rounded-[1.7rem] border border-border/80 bg-card/94 p-8 shadow-[0_24px_70px_rgba(20,20,20,0.12)] backdrop-blur dark:shadow-[0_26px_70px_rgba(0,0,0,0.34)]",
         children: /* @__PURE__ */ jsxs("form", {
           onSubmit: handleSubmit,
           className: "space-y-5",
@@ -1477,18 +1515,16 @@ function ResetPassword() {
   return /* @__PURE__ */ jsxs("div", {
     className: "flex min-h-screen items-center justify-center p-4",
     children: [/* @__PURE__ */ jsx("div", {
-      className: "absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-background to-background"
+      className: "absolute inset-0 -z-10 bg-gradient-to-br from-accent/20 via-background to-background dark:from-accent/10"
     }), /* @__PURE__ */ jsx("div", {
-      className: "absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(139,92,246,0.1),transparent_50%)]"
+      className: "absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(191,163,122,0.24),transparent_42%),radial-gradient(circle_at_80%_18%,rgba(138,129,120,0.1),transparent_20%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(191,163,122,0.14),transparent_34%),radial-gradient(circle_at_80%_18%,rgba(138,129,120,0.1),transparent_18%)]"
     }), /* @__PURE__ */ jsxs("div", {
       className: "w-full max-w-md space-y-8",
-      children: [/* @__PURE__ */ jsxs("div", {
-        className: "flex flex-col items-center gap-4",
-        children: [/* @__PURE__ */ jsx("div", {
-          className: "flex h-16 w-16 items-center justify-center rounded-2xl bg-primary",
-          children: /* @__PURE__ */ jsx(Film, {
-            className: "h-10 w-10 text-primary-foreground"
-          })
+      children: [/* @__PURE__ */ jsxs(Link, {
+        to: "/",
+        className: "flex flex-col items-center gap-4 group transition-opacity hover:opacity-90",
+        children: [/* @__PURE__ */ jsx(BrandLogo, {
+          className: "h-[58px] w-auto object-contain transition-transform group-hover:scale-[1.02] sm:h-[64px]"
         }), /* @__PURE__ */ jsxs("div", {
           className: "text-center",
           children: [/* @__PURE__ */ jsx("h1", {
@@ -1500,7 +1536,7 @@ function ResetPassword() {
           })]
         })]
       }), /* @__PURE__ */ jsx("div", {
-        className: "rounded-2xl border border-border bg-card p-8 shadow-xl",
+        className: "rounded-[1.7rem] border border-border/80 bg-card/94 p-8 shadow-[0_24px_70px_rgba(20,20,20,0.12)] backdrop-blur dark:shadow-[0_26px_70px_rgba(0,0,0,0.34)]",
         children: success ? /* @__PURE__ */ jsxs("div", {
           className: "space-y-6 text-center",
           children: [/* @__PURE__ */ jsx("div", {
@@ -1700,7 +1736,7 @@ const rankingService = {
       auth: "required",
       headers: buildRankingHeaders()
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok || !(payload == null ? void 0 : payload.data)) {
       throw new Error(`Failed to load ranking score (${response.status})`);
     }
@@ -1711,7 +1747,7 @@ const rankingService = {
       auth: "required",
       headers: buildRankingHeaders()
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok || !(payload == null ? void 0 : payload.data)) {
       throw new Error(`Failed to load leaderboard (${response.status})`);
     }
@@ -1735,7 +1771,7 @@ const rankingService = {
     };
   }
 };
-const DEFAULT_IA_SERVICE_BASE_URL = "http://localhost:8080";
+const DEFAULT_IA_SERVICE_BASE_URL = "";
 const IA_MODEL_LABEL = "Gemini 2.5 Flash";
 function getIaServiceBaseUrl() {
   const configuredBaseUrl = void 0;
@@ -1785,7 +1821,7 @@ async function fetchIa(path) {
       "Content-Type": "application/json"
     }
   });
-  const payload = await parseJsonSafely(response);
+  const payload = await parseJsonSafely$1(response);
   if (!response.ok) {
     const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `IA request failed with status ${response.status}`;
     throw new Error(errorMessage);
@@ -1810,213 +1846,112 @@ const iaService = {
     return ((payload == null ? void 0 : payload.data) ?? []).map(mapArticle);
   }
 };
-function DropdownMenu({
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(DropdownMenuPrimitive.Root, { "data-slot": "dropdown-menu", ...props });
+const parseJsonSafely = void 0;
+const coreFetch = void 0;
+const DISCOVER_FILMS_ENDPOINT = "/api/catalog/films/tmdb/discover";
+const TMDB_IMAGE_BASE_URL$1 = "https://image.tmdb.org/t/p/w500";
+const DEFAULT_DISCOVER_REQUEST = {
+  includeAdult: false,
+  includeVideo: false,
+  language: "en-US",
+  page: 1,
+  sortBy: "popularity.desc"
+};
+function mapPosterUrl(posterPath) {
+  return posterPath ? `${TMDB_IMAGE_BASE_URL$1}${posterPath}` : "";
 }
-function DropdownMenuTrigger({
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(
-    DropdownMenuPrimitive.Trigger,
-    {
-      "data-slot": "dropdown-menu-trigger",
-      ...props
-    }
-  );
-}
-function DropdownMenuContent({
-  className,
-  sideOffset = 4,
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(DropdownMenuPrimitive.Portal, { children: /* @__PURE__ */ jsx(
-    DropdownMenuPrimitive.Content,
-    {
-      "data-slot": "dropdown-menu-content",
-      sideOffset,
-      className: cn(
-        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
-        className
-      ),
-      ...props
-    }
-  ) });
-}
-function DropdownMenuItem({
-  className,
-  inset,
-  variant = "default",
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(
-    DropdownMenuPrimitive.Item,
-    {
-      "data-slot": "dropdown-menu-item",
-      "data-inset": inset,
-      "data-variant": variant,
-      className: cn(
-        "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      ),
-      ...props
-    }
-  );
-}
-function DropdownMenuSeparator({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(
-    DropdownMenuPrimitive.Separator,
-    {
-      "data-slot": "dropdown-menu-separator",
-      className: cn("bg-border -mx-1 my-1 h-px", className),
-      ...props
-    }
-  );
-}
-function Avatar({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(
-    AvatarPrimitive.Root,
-    {
-      "data-slot": "avatar",
-      className: cn(
-        "relative flex size-10 shrink-0 overflow-hidden rounded-full",
-        className
-      ),
-      ...props
-    }
-  );
-}
-function AvatarImage({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(
-    AvatarPrimitive.Image,
-    {
-      "data-slot": "avatar-image",
-      className: cn("aspect-square size-full", className),
-      ...props
-    }
-  );
-}
-function AvatarFallback({
-  className,
-  ...props
-}) {
-  return /* @__PURE__ */ jsx(
-    AvatarPrimitive.Fallback,
-    {
-      "data-slot": "avatar-fallback",
-      className: cn(
-        "bg-muted flex size-full items-center justify-center rounded-full",
-        className
-      ),
-      ...props
-    }
-  );
-}
-function Navbar() {
-  const navigate = useNavigate();
-  const user = authService.getCurrentUser();
-  const handleLogout = () => {
-    authService.logout();
-    navigate("/login");
+function mapLandingMovie(movie) {
+  return {
+    id: String(movie.id),
+    title: movie.title,
+    synopsis: movie.overview,
+    posterUrl: mapPosterUrl(movie.poster_path),
+    releaseDate: movie.release_date,
+    releaseYear: movie.release_date ? movie.release_date.slice(0, 4) : "TBA",
+    rating: movie.vote_average,
+    trailerKey: movie.trailer_key
   };
-  if (!user) return null;
-  return /* @__PURE__ */ jsx("nav", { className: "sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80", children: /* @__PURE__ */ jsx("div", { className: "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8", children: /* @__PURE__ */ jsxs("div", { className: "flex h-16 items-center justify-between", children: [
-    /* @__PURE__ */ jsxs(Link, { to: "/home", className: "flex items-center gap-2", children: [
-      /* @__PURE__ */ jsx("div", { className: "flex h-10 w-10 items-center justify-center rounded-lg bg-primary", children: /* @__PURE__ */ jsx(Film, { className: "h-6 w-6 text-primary-foreground" }) }),
-      /* @__PURE__ */ jsxs("div", { className: "flex flex-col", children: [
-        /* @__PURE__ */ jsx("span", { className: "text-lg font-semibold leading-none", children: "MovieVault" }),
-        /* @__PURE__ */ jsx("span", { className: "text-xs text-muted-foreground", children: "Your Cinema Collection" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { className: "hidden md:flex items-center gap-6", children: [
-      /* @__PURE__ */ jsx(
-        Link,
-        {
-          to: "/catalog",
-          className: "text-sm text-muted-foreground hover:text-foreground transition-colors",
-          children: "Catalog"
-        }
-      ),
-      /* @__PURE__ */ jsx(
-        Link,
-        {
-          to: "/collection",
-          className: "text-sm text-muted-foreground hover:text-foreground transition-colors",
-          children: "My Collection"
-        }
-      ),
-      /* @__PURE__ */ jsx(
-        Link,
-        {
-          to: "/ai-content",
-          className: "text-sm text-muted-foreground hover:text-foreground transition-colors",
-          children: "AI Insights"
-        }
-      ),
-      /* @__PURE__ */ jsx(
-        Link,
-        {
-          to: "/ranking",
-          className: "text-sm text-muted-foreground hover:text-foreground transition-colors",
-          children: "Leaderboard"
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxs(DropdownMenu, { children: [
-      /* @__PURE__ */ jsx(DropdownMenuTrigger, { className: "focus:outline-none", children: /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 rounded-full border border-border bg-secondary/50 py-1.5 pl-1.5 pr-4 hover:bg-secondary transition-colors", children: [
-        /* @__PURE__ */ jsxs(Avatar, { className: "h-8 w-8", children: [
-          /* @__PURE__ */ jsx(AvatarImage, { src: user.avatar, alt: user.name }),
-          /* @__PURE__ */ jsx(AvatarFallback, { children: user.name.charAt(0) })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "hidden sm:flex flex-col items-start", children: [
-          /* @__PURE__ */ jsx("span", { className: "text-sm font-medium leading-none", children: user.name }),
-          /* @__PURE__ */ jsx("span", { className: "text-xs text-muted-foreground", children: user.role })
-        ] })
-      ] }) }),
-      /* @__PURE__ */ jsxs(DropdownMenuContent, { align: "end", className: "w-56", children: [
-        /* @__PURE__ */ jsxs("div", { className: "px-2 py-1.5", children: [
-          /* @__PURE__ */ jsx("p", { className: "text-sm font-medium", children: user.name }),
-          /* @__PURE__ */ jsx("p", { className: "text-xs text-muted-foreground", children: user.email })
-        ] }),
-        /* @__PURE__ */ jsx(DropdownMenuSeparator, {}),
-        /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: () => navigate("/ranking"), children: [
-          /* @__PURE__ */ jsx(Trophy, { className: "mr-2 h-4 w-4" }),
-          /* @__PURE__ */ jsx("span", { children: "My Ranking" })
-        ] }),
-        /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: () => navigate("/settings"), children: [
-          /* @__PURE__ */ jsx(Settings$1, { className: "mr-2 h-4 w-4" }),
-          /* @__PURE__ */ jsx("span", { children: "Settings" })
-        ] }),
-        /* @__PURE__ */ jsx(DropdownMenuSeparator, {}),
-        /* @__PURE__ */ jsxs(DropdownMenuItem, { onClick: handleLogout, children: [
-          /* @__PURE__ */ jsx(LogOut, { className: "mr-2 h-4 w-4" }),
-          /* @__PURE__ */ jsx("span", { children: "Logout" })
-        ] })
-      ] })
-    ] })
-  ] }) }) });
 }
+function getReleaseTimestamp(movie) {
+  if (!movie.releaseDate) {
+    return 0;
+  }
+  const parsedDate = new Date(movie.releaseDate);
+  return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
+}
+function buildLandingCollections(movies) {
+  const freshPicks = [...movies].sort((left, right) => getReleaseTimestamp(right) - getReleaseTimestamp(left) || right.rating - left.rating).slice(0, 4);
+  const freshPickIds = new Set(freshPicks.map((movie) => movie.id));
+  const worthALook = [...movies].filter((movie) => !freshPickIds.has(movie.id)).sort((left, right) => right.rating - left.rating || getReleaseTimestamp(right) - getReleaseTimestamp(left)).slice(0, 4);
+  return [
+    {
+      id: "discover-grid",
+      title: "Discover Feed",
+      description: "The first page of the TMDB discover feed, sorted by popularity.",
+      movies: movies.slice(0, 6)
+    },
+    {
+      id: "fresh-picks",
+      title: "Fresh Picks",
+      description: "The most recent releases from the current discover feed.",
+      movies: freshPicks
+    },
+    {
+      id: "worth-a-look",
+      title: "Worth A Look",
+      description: "The strongest-rated titles from the same feed, excluding the fresh picks.",
+      movies: worthALook
+    }
+  ];
+}
+async function fetchDiscoverFilms(request = DEFAULT_DISCOVER_REQUEST) {
+  var _a;
+  const response = await coreFetch(DISCOVER_FILMS_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(request)
+  });
+  const payload = await parseJsonSafely(response);
+  if (!response.ok) {
+    const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Discover request failed with status ${response.status}`;
+    throw new Error(errorMessage);
+  }
+  if (!((_a = payload == null ? void 0 : payload.data) == null ? void 0 : _a.results)) {
+    throw new Error("Invalid discover response");
+  }
+  return payload;
+}
+const landingService = {
+  async getDiscoverMovies(request = {}) {
+    const payload = await fetchDiscoverFilms({
+      ...DEFAULT_DISCOVER_REQUEST,
+      ...request
+    });
+    return payload.data.results.map(mapLandingMovie);
+  },
+  async getLandingPayload() {
+    const payload = await fetchDiscoverFilms(DEFAULT_DISCOVER_REQUEST);
+    const movies = payload.data.results.map(mapLandingMovie);
+    return {
+      heroMovies: movies.slice(0, 4),
+      spotlightMovies: movies.slice(0, 2),
+      collections: buildLandingCollections(movies)
+    };
+  }
+};
 function AIArticleBlock({ article, compact = false, href }) {
   const getModelColor = () => {
     switch (article.model) {
       case "Gemini 2.5 Flash":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+        return "border-accent/40 bg-accent/16 text-primary dark:text-accent";
       case "Gemini Pro":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+        return "border-accent/40 bg-accent/16 text-primary dark:text-accent";
       case "GPT-4":
-        return "bg-green-500/10 text-green-500 border-green-500/20";
+        return "border-primary/30 bg-primary/10 text-primary dark:text-primary-foreground";
       case "Claude 3":
-        return "bg-purple-500/10 text-purple-500 border-purple-500/20";
+        return "border-border bg-secondary/60 text-foreground";
       default:
         return "bg-primary/10 text-primary border-primary/20";
     }
@@ -2077,6 +2012,191 @@ function AIArticleBlock({ article, compact = false, href }) {
     ] }) })
   ] });
 }
+const CarouselContext = React.createContext(null);
+function useCarousel() {
+  const context = React.useContext(CarouselContext);
+  if (!context) {
+    throw new Error("useCarousel must be used within a <Carousel />");
+  }
+  return context;
+}
+function Carousel({
+  orientation = "horizontal",
+  opts,
+  setApi,
+  plugins,
+  className,
+  children,
+  ...props
+}) {
+  const [carouselRef, api] = useEmblaCarousel(
+    {
+      ...opts,
+      axis: orientation === "horizontal" ? "x" : "y"
+    },
+    plugins
+  );
+  const [canScrollPrev, setCanScrollPrev] = React.useState(false);
+  const [canScrollNext, setCanScrollNext] = React.useState(false);
+  const onSelect = React.useCallback((api2) => {
+    if (!api2) return;
+    setCanScrollPrev(api2.canScrollPrev());
+    setCanScrollNext(api2.canScrollNext());
+  }, []);
+  const scrollPrev = React.useCallback(() => {
+    api == null ? void 0 : api.scrollPrev();
+  }, [api]);
+  const scrollNext = React.useCallback(() => {
+    api == null ? void 0 : api.scrollNext();
+  }, [api]);
+  const handleKeyDown = React.useCallback(
+    (event) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        scrollPrev();
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        scrollNext();
+      }
+    },
+    [scrollPrev, scrollNext]
+  );
+  React.useEffect(() => {
+    if (!api || !setApi) return;
+    setApi(api);
+  }, [api, setApi]);
+  React.useEffect(() => {
+    if (!api) return;
+    onSelect(api);
+    api.on("reInit", onSelect);
+    api.on("select", onSelect);
+    return () => {
+      api == null ? void 0 : api.off("select", onSelect);
+    };
+  }, [api, onSelect]);
+  return /* @__PURE__ */ jsx(
+    CarouselContext.Provider,
+    {
+      value: {
+        carouselRef,
+        api,
+        opts,
+        orientation: orientation || ((opts == null ? void 0 : opts.axis) === "y" ? "vertical" : "horizontal"),
+        scrollPrev,
+        scrollNext,
+        canScrollPrev,
+        canScrollNext
+      },
+      children: /* @__PURE__ */ jsx(
+        "div",
+        {
+          onKeyDownCapture: handleKeyDown,
+          className: cn("relative", className),
+          role: "region",
+          "aria-roledescription": "carousel",
+          "data-slot": "carousel",
+          ...props,
+          children
+        }
+      )
+    }
+  );
+}
+function CarouselContent({ className, ...props }) {
+  const { carouselRef, orientation } = useCarousel();
+  return /* @__PURE__ */ jsx(
+    "div",
+    {
+      ref: carouselRef,
+      className: "overflow-hidden",
+      "data-slot": "carousel-content",
+      children: /* @__PURE__ */ jsx(
+        "div",
+        {
+          className: cn(
+            "flex",
+            orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
+            className
+          ),
+          ...props
+        }
+      )
+    }
+  );
+}
+function CarouselItem({ className, ...props }) {
+  const { orientation } = useCarousel();
+  return /* @__PURE__ */ jsx(
+    "div",
+    {
+      role: "group",
+      "aria-roledescription": "slide",
+      "data-slot": "carousel-item",
+      className: cn(
+        "min-w-0 shrink-0 grow-0 basis-full",
+        orientation === "horizontal" ? "pl-4" : "pt-4",
+        className
+      ),
+      ...props
+    }
+  );
+}
+function CarouselPrevious({
+  className,
+  variant = "outline",
+  size = "icon",
+  ...props
+}) {
+  const { orientation, scrollPrev, canScrollPrev } = useCarousel();
+  return /* @__PURE__ */ jsxs(
+    Button,
+    {
+      "data-slot": "carousel-previous",
+      variant,
+      size,
+      className: cn(
+        "absolute size-8 rounded-full",
+        orientation === "horizontal" ? "top-1/2 -left-12 -translate-y-1/2" : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
+        className
+      ),
+      disabled: !canScrollPrev,
+      onClick: scrollPrev,
+      ...props,
+      children: [
+        /* @__PURE__ */ jsx(ArrowLeft, {}),
+        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Previous slide" })
+      ]
+    }
+  );
+}
+function CarouselNext({
+  className,
+  variant = "outline",
+  size = "icon",
+  ...props
+}) {
+  const { orientation, scrollNext, canScrollNext } = useCarousel();
+  return /* @__PURE__ */ jsxs(
+    Button,
+    {
+      "data-slot": "carousel-next",
+      variant,
+      size,
+      className: cn(
+        "absolute size-8 rounded-full",
+        orientation === "horizontal" ? "top-1/2 -right-12 -translate-y-1/2" : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
+        className
+      ),
+      disabled: !canScrollNext,
+      onClick: scrollNext,
+      ...props,
+      children: [
+        /* @__PURE__ */ jsx(ArrowRight, {}),
+        /* @__PURE__ */ jsx("span", { className: "sr-only", children: "Next slide" })
+      ]
+    }
+  );
+}
 function DiscoverShowcaseCard({
   movie
 }) {
@@ -2091,9 +2211,9 @@ function DiscoverShowcaseCard({
           alt: movie.title,
           className: "h-full w-full object-cover"
         }), /* @__PURE__ */ jsxs("div", {
-          className: "absolute right-4 top-4 flex items-center gap-1 rounded-full bg-black/80 px-2.5 py-1 text-xs text-white backdrop-blur",
+          className: "absolute right-4 top-4 flex items-center gap-1 rounded-full border border-border/70 bg-card/90 px-2.5 py-1 text-xs text-foreground backdrop-blur",
           children: [/* @__PURE__ */ jsx(Star, {
-            className: "h-3 w-3 fill-yellow-400 text-yellow-400"
+            className: "h-3 w-3 fill-accent text-accent"
           }), movie.rating.toFixed(1)]
         })]
       }), /* @__PURE__ */ jsxs("div", {
@@ -2120,7 +2240,7 @@ function DiscoverShowcaseCard({
           children: [/* @__PURE__ */ jsxs("span", {
             children: ["Release date: ", movie.releaseDate || "TBA"]
           }), /* @__PURE__ */ jsxs("span", {
-            children: ["TMDB score: ", movie.rating.toFixed(1)]
+            children: ["Rating: ", movie.rating.toFixed(1)]
           })]
         }), /* @__PURE__ */ jsx("div", {
           className: "flex flex-wrap gap-3",
@@ -2178,9 +2298,9 @@ function Home() {
     children: [/* @__PURE__ */ jsx(Navbar, {}), /* @__PURE__ */ jsxs("div", {
       className: "min-h-screen bg-background",
       children: [/* @__PURE__ */ jsxs("div", {
-        className: "relative overflow-hidden border-b border-border bg-[linear-gradient(135deg,rgba(193,18,31,0.12),rgba(9,9,10,0.96)_45%,rgba(9,9,10,1))]",
+        className: "relative overflow-hidden border-b border-border bg-[linear-gradient(135deg,rgba(191,163,122,0.28),rgba(246,239,228,0.96)_45%,rgba(239,230,216,1))] dark:bg-[linear-gradient(135deg,rgba(191,163,122,0.12),rgba(38,38,38,0.98)_45%,rgba(20,20,20,1))]",
         children: [/* @__PURE__ */ jsx("div", {
-          className: "absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(140,106,67,0.18),transparent_42%)]"
+          className: "absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(138,129,120,0.12),transparent_42%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(191,163,122,0.1),transparent_40%)]"
         }), /* @__PURE__ */ jsx("div", {
           className: "relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16",
           children: /* @__PURE__ */ jsxs("div", {
@@ -2283,7 +2403,7 @@ function Home() {
                 children: "Discover Showcase"
               }), /* @__PURE__ */ jsx("p", {
                 className: "text-muted-foreground mt-1",
-                children: "Live titles coming from the public discover endpoint"
+                children: "A rotating selection of notable films to explore next."
               })]
             }), /* @__PURE__ */ jsx(Button, {
               asChild: true,
@@ -2310,7 +2430,7 @@ function Home() {
             })]
           }) : /* @__PURE__ */ jsx("div", {
             className: "rounded-2xl border border-border bg-card p-8 text-center text-muted-foreground",
-            children: "The discover feed is empty right now."
+            children: "There is nothing to show here right now."
           })]
         }), /* @__PURE__ */ jsxs("section", {
           children: [/* @__PURE__ */ jsxs("div", {
@@ -2345,7 +2465,7 @@ function Home() {
           className: "grid grid-cols-1 md:grid-cols-2 gap-6",
           children: [/* @__PURE__ */ jsx(Link, {
             to: "/catalog",
-            className: "group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/20 to-primary/5 p-8 transition-all hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10",
+            className: "group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-accent/24 to-card p-8 transition-all hover:border-accent/60 hover:shadow-xl hover:shadow-primary/10 dark:from-accent/10 dark:to-card",
             children: /* @__PURE__ */ jsxs("div", {
               className: "relative z-10",
               children: [/* @__PURE__ */ jsx(Film, {
@@ -2365,11 +2485,11 @@ function Home() {
             })
           }), /* @__PURE__ */ jsx(Link, {
             to: "/ranking",
-            className: "group relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(135deg,rgba(140,106,67,0.22),rgba(111,29,27,0.08))] p-8 transition-all hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10",
+            className: "group relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(135deg,rgba(191,163,122,0.28),rgba(138,129,120,0.08))] p-8 transition-all hover:border-accent/60 hover:shadow-xl hover:shadow-primary/10 dark:bg-[linear-gradient(135deg,rgba(191,163,122,0.12),rgba(138,129,120,0.12))]",
             children: /* @__PURE__ */ jsxs("div", {
               className: "relative z-10",
               children: [/* @__PURE__ */ jsx(TrendingUp, {
-                className: "mb-4 h-12 w-12 text-[#8c6a43]"
+                className: "mb-4 h-12 w-12 text-accent"
               }), /* @__PURE__ */ jsx("h3", {
                 className: "text-xl font-bold mb-2",
                 children: "Leaderboard"
@@ -2377,7 +2497,7 @@ function Home() {
                 className: "text-muted-foreground",
                 children: "See how you rank against other movie enthusiasts worldwide"
               }), /* @__PURE__ */ jsxs("div", {
-                className: "mt-4 flex items-center gap-2 text-blue-500 font-medium",
+                className: "mt-4 flex items-center gap-2 font-medium text-primary",
                 children: ["View rankings", /* @__PURE__ */ jsx(ArrowRight, {
                   className: "h-4 w-4 transition-transform group-hover:translate-x-1"
                 })]
@@ -2470,7 +2590,7 @@ function CatalogSearchCard({ item }) {
               className: "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             }
           ),
-          /* @__PURE__ */ jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 opacity-0 transition-opacity group-hover:opacity-100" })
+          /* @__PURE__ */ jsx("div", { className: "absolute inset-0 bg-gradient-to-t from-background/90 via-background/0 to-background/0 opacity-0 transition-opacity group-hover:opacity-100" })
         ] }),
         /* @__PURE__ */ jsxs("div", { className: "space-y-3 p-4", children: [
           /* @__PURE__ */ jsxs("div", { children: [
@@ -2499,20 +2619,6 @@ function CatalogSearchCard({ item }) {
       ] })
     }
   );
-}
-function getApiBaseUrl() {
-  if (typeof window === "undefined") {
-    return "";
-  }
-  const { protocol, hostname, port, origin } = window.location;
-  if ((hostname === "localhost" || hostname === "127.0.0.1") && port === "5173") {
-    return `${protocol}//${hostname}`;
-  }
-  return origin;
-}
-function buildApiUrl(path) {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  return `${getApiBaseUrl()}${normalizedPath}`;
 }
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 const TMDB_SEARCH_ENDPOINT = "/api/catalog/films/tmdb/search";
@@ -2595,8 +2701,35 @@ function mapEditionPictureUrl(slug, pictureId) {
   }
   return buildApiUrl(`/static/images/${encodeURIComponent(normalizedSlug)}/${encodeURIComponent(normalizedPictureId)}.jpeg`);
 }
+function parseEditionReleaseYear(value) {
+  if (typeof value === "number") {
+    return value;
+  }
+  if (typeof value === "string") {
+    const normalizedValue = value.trim();
+    if (/^\d{4}$/.test(normalizedValue)) {
+      return Number(normalizedValue);
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)) {
+      return Number(normalizedValue.slice(0, 4));
+    }
+  }
+  if (value && typeof value.value === "number") {
+    return value.value;
+  }
+  if (value && typeof value.value === "string") {
+    const normalizedValue = value.value.trim();
+    if (/^\d{4}$/.test(normalizedValue)) {
+      return Number(normalizedValue);
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)) {
+      return Number(normalizedValue.slice(0, 4));
+    }
+  }
+  return 0;
+}
 function mapEditionDetail(item) {
-  var _a, _b, _c, _d;
+  var _a, _b, _c;
   persistEditionIdentity(item.slug, item.id);
   const pictures = item.pictures.map((picture) => ({
     id: picture.id,
@@ -2612,7 +2745,7 @@ function mapEditionDetail(item) {
     barcode: item.barcode,
     country: item.country,
     format: item.format,
-    releaseYear: ((_d = item.release_year) == null ? void 0 : _d.value) ?? 0,
+    releaseYear: parseEditionReleaseYear(item.release_year),
     packagingType: item.packaging_type,
     verified: item.verified,
     coverPictureId,
@@ -2622,6 +2755,8 @@ function mapEditionDetail(item) {
   };
 }
 function mapTmdbSearchMovie(movie) {
+  const normalizedReleaseDate = movie.release_date.trim();
+  const releaseYear = /^\d{4}-\d{2}-\d{2}$/.test(normalizedReleaseDate) ? normalizedReleaseDate.slice(0, 4) : "TBA";
   return {
     id: String(movie.id),
     tmdbId: movie.id,
@@ -2629,8 +2764,8 @@ function mapTmdbSearchMovie(movie) {
     overview: movie.overview,
     posterPath: movie.poster_path,
     posterUrl: movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : "",
-    releaseDate: movie.release_date,
-    releaseYear: movie.release_date ? movie.release_date.slice(0, 4) : "TBA",
+    releaseDate: normalizedReleaseDate,
+    releaseYear,
     rating: movie.vote_average
   };
 }
@@ -2671,7 +2806,7 @@ const catalogService = {
         "Content-Type": "application/json"
       }
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok) {
       const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Catalog search failed with status ${response.status}`;
       throw new Error(errorMessage);
@@ -2718,7 +2853,7 @@ const catalogService = {
       },
       body: JSON.stringify(requestBody)
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok) {
       const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `TMDB search failed with status ${response.status}`;
       throw new Error(errorMessage);
@@ -2752,7 +2887,7 @@ const catalogService = {
       },
       body: JSON.stringify(requestBody)
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok) {
       const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Film creation failed with status ${response.status}`;
       throw new Error(errorMessage);
@@ -2771,7 +2906,7 @@ const catalogService = {
       },
       body: JSON.stringify(request)
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok) {
       const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Release creation failed with status ${response.status}`;
       throw new Error(errorMessage);
@@ -2792,7 +2927,7 @@ const catalogService = {
       auth: "required",
       body: formData
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok) {
       const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Edition picture upload failed with status ${response.status}`;
       throw new Error(errorMessage);
@@ -2813,7 +2948,7 @@ const catalogService = {
         "Content-Type": "application/json"
       }
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok) {
       const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Edition cover assignment failed with status ${response.status}`;
       throw new Error(errorMessage);
@@ -2838,7 +2973,7 @@ const catalogService = {
         "Content-Type": "application/json"
       }
     });
-    const payload = await parseJsonSafely(response);
+    const payload = await parseJsonSafely$1(response);
     if (!response.ok) {
       const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Edition detail failed with status ${response.status}`;
       throw new Error(errorMessage);
@@ -2850,11 +2985,14 @@ const catalogService = {
   }
 };
 function Catalog() {
+  var _a;
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchResult, setSearchResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [error, setError] = useState("");
+  const routeQuery = ((_a = searchParams.get("query")) == null ? void 0 : _a.trim()) ?? "";
   const runSearch = async (query, page = 1) => {
     setLoading(true);
     setError("");
@@ -2870,14 +3008,29 @@ function Catalog() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    setSearchQuery(routeQuery);
+    if (!routeQuery) {
+      setActiveQuery("");
+      setSearchResult(null);
+      setError("");
+      return;
+    }
+    void runSearch(routeQuery, 0);
+  }, [routeQuery]);
   const handleSearch = (query) => {
-    runSearch(query, 0);
+    const normalizedQuery = query.trim();
+    if (!normalizedQuery) {
+      setSearchParams({});
+      return;
+    }
+    setSearchParams({
+      query: normalizedQuery
+    });
   };
   const clearSearch = () => {
     setSearchQuery("");
-    setActiveQuery("");
-    setSearchResult(null);
-    setError("");
+    setSearchParams({});
   };
   return /* @__PURE__ */ jsxs(Fragment, {
     children: [/* @__PURE__ */ jsx(Navbar, {}), /* @__PURE__ */ jsxs("div", {
@@ -2894,7 +3047,7 @@ function Catalog() {
                 children: "Movie Catalog"
               }), /* @__PURE__ */ jsx("p", {
                 className: "mt-1 text-muted-foreground",
-                children: "Search the indexed catalog through the backend Elastic endpoint"
+                children: "Search the archive by title, release, or barcode."
               })]
             }), /* @__PURE__ */ jsx("div", {
               className: "rounded-2xl border border-primary/20 bg-primary/10 p-4",
@@ -2906,7 +3059,7 @@ function Catalog() {
                     children: "Can't find the release you need?"
                   }), /* @__PURE__ */ jsx("p", {
                     className: "mt-1 text-sm text-muted-foreground",
-                    children: "Search existing releases here, or start the release creation flow from a TMDB film search."
+                    children: "If it is not listed yet, add a new release to the catalog."
                   })]
                 }), /* @__PURE__ */ jsx(Button, {
                   asChild: true,
@@ -2939,7 +3092,7 @@ function Catalog() {
                 })]
               }) : /* @__PURE__ */ jsx("div", {
                 className: "rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground",
-                children: "Use the search bar to query `/api/catalog/elastic/search`"
+                children: "Search by film title, edition title, or barcode"
               })
             })]
           })
@@ -3025,7 +3178,7 @@ function Catalog() {
             children: "Search the catalog"
           }), /* @__PURE__ */ jsx("p", {
             className: "mb-4 text-muted-foreground",
-            children: "Start with a title query and the page will call the backend Elastic search endpoint."
+            children: "Start with a title, label, or barcode to explore the catalog."
           }), /* @__PURE__ */ jsxs("div", {
             className: "flex flex-wrap justify-center gap-3",
             children: [/* @__PURE__ */ jsx(Button, {
@@ -3482,14 +3635,14 @@ function AddRelease() {
               className: "inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm text-primary",
               children: [/* @__PURE__ */ jsx(PlusCircle, {
                 className: "h-4 w-4"
-              }), "Add release workflow"]
+              }), "Add a release"]
             }), /* @__PURE__ */ jsxs("div", {
               children: [/* @__PURE__ */ jsx("h1", {
                 className: "text-3xl font-bold",
                 children: "Add a new release"
               }), /* @__PURE__ */ jsx("p", {
                 className: "mt-2 max-w-3xl text-muted-foreground",
-                children: "Search the film in TMDB, complete the release metadata, then the page will create the film in the backend and immediately attach the release to it."
+                children: "Find the film, enter the edition details, and add it to the archive with its images and release information."
               })]
             })]
           })
@@ -3497,7 +3650,7 @@ function AddRelease() {
       }), /* @__PURE__ */ jsxs("div", {
         className: "mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8",
         children: [/* @__PURE__ */ jsx("section", {
-          className: "rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10",
+          className: "rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(20,20,20,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]",
           children: /* @__PURE__ */ jsxs("div", {
             className: "space-y-5",
             children: [/* @__PURE__ */ jsxs("div", {
@@ -3506,7 +3659,7 @@ function AddRelease() {
                 children: "1. Search the film"
               }), /* @__PURE__ */ jsx("p", {
                 className: "mt-1 text-sm text-muted-foreground",
-                children: "Type at least two characters. Results are fetched progressively from `/api/catalog/tmdb/search`."
+                children: "Start typing the title to find the film you want to work with."
               })]
             }), /* @__PURE__ */ jsxs("div", {
               ref: containerRef,
@@ -3533,7 +3686,7 @@ function AddRelease() {
                   className: "absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-primary"
                 })]
               }), isOpen && (query.trim().length >= 2 || error) && /* @__PURE__ */ jsx("div", {
-                className: "absolute z-30 mt-2 max-h-96 w-full overflow-hidden rounded-2xl border border-border bg-popover shadow-2xl shadow-black/20",
+                className: "absolute z-30 mt-2 max-h-96 w-full overflow-hidden rounded-2xl border border-border bg-popover shadow-[0_24px_60px_rgba(20,20,20,0.16)] dark:shadow-[0_28px_70px_rgba(0,0,0,0.34)]",
                 children: /* @__PURE__ */ jsx("div", {
                   className: "max-h-96 overflow-y-auto p-2",
                   children: error ? /* @__PURE__ */ jsx("div", {
@@ -3543,7 +3696,7 @@ function AddRelease() {
                     className: "flex items-center gap-3 rounded-xl px-4 py-6 text-sm text-muted-foreground",
                     children: [/* @__PURE__ */ jsx(Loader2, {
                       className: "h-4 w-4 animate-spin text-primary"
-                    }), "Searching TMDB..."]
+                    }), "Searching titles..."]
                   }) : results.length > 0 ? /* @__PURE__ */ jsx("div", {
                     className: "space-y-2",
                     children: results.map((movie) => /* @__PURE__ */ jsxs("button", {
@@ -3580,7 +3733,7 @@ function AddRelease() {
             })]
           })
         }), /* @__PURE__ */ jsx("section", {
-          className: "mt-8 rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10",
+          className: "mt-8 rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(20,20,20,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]",
           children: /* @__PURE__ */ jsxs("div", {
             className: "space-y-4",
             children: [/* @__PURE__ */ jsx("h2", {
@@ -3621,16 +3774,16 @@ function AddRelease() {
                   children: selectedMovie.overview
                 }), /* @__PURE__ */ jsx("div", {
                   className: "rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground",
-                  children: "The backend will create this film idempotently using its TMDB id, then the resulting internal film id will be used to create the release."
+                  children: "Review the selected title before moving on to the edition details."
                 })]
               })]
             }) : /* @__PURE__ */ jsx("div", {
               className: "rounded-xl border border-dashed border-border px-5 py-8 text-sm text-muted-foreground",
-              children: "Search and choose a film above to continue with the release creation flow."
+              children: "Choose a film above to continue with the release entry."
             })]
           })
         }), /* @__PURE__ */ jsx("section", {
-          className: "mt-8 rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10",
+          className: "mt-8 rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(20,20,20,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]",
           children: /* @__PURE__ */ jsxs("div", {
             className: "space-y-6",
             children: [/* @__PURE__ */ jsxs("div", {
@@ -3639,7 +3792,7 @@ function AddRelease() {
                 children: "3. Release metadata"
               }), /* @__PURE__ */ jsx("p", {
                 className: "mt-1 text-sm text-muted-foreground",
-                children: "Complete the release information. `filmId` is not editable here because it will come from the backend after the film is created or resolved idempotently."
+                children: "Complete the edition details as they appear on your copy."
               })]
             }), /* @__PURE__ */ jsxs("form", {
               onSubmit: handleSubmit,
@@ -3881,7 +4034,7 @@ function AddRelease() {
                 className: "flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-background/60 p-4",
                 children: [/* @__PURE__ */ jsx("p", {
                   className: "text-sm text-muted-foreground",
-                  children: "Submit flow: create film from TMDB data, create the release with the returned `filmId`, upload every selected image with the returned `editionId`, then assign the chosen image as the edition cover."
+                  children: "Check the details one last time before adding the release to the archive."
                 }), /* @__PURE__ */ jsxs("div", {
                   className: "flex flex-wrap gap-3",
                   children: [pendingPictureEditionId && selectedImages.length > 0 && coverImageId && /* @__PURE__ */ jsx(Button, {
@@ -3942,6 +4095,278 @@ function Separator({
     }
   );
 }
+const POSTER_PALETTES = [
+  ["#081f3f", "#1d4ed8", "#7dd3fc"],
+  ["#2a0b3f", "#7c3aed", "#f0abfc"],
+  ["#1a2e05", "#65a30d", "#bef264"],
+  ["#3f0d0d", "#dc2626", "#fca5a5"],
+  ["#172554", "#0ea5e9", "#fde68a"],
+  ["#3b0764", "#db2777", "#f9a8d4"],
+  ["#111827", "#f59e0b", "#fef3c7"],
+  ["#0f172a", "#14b8a6", "#99f6e4"]
+];
+function escapeSvgText(value) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function toDataUri(svg) {
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+function getPalette(seed) {
+  const index = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0) % POSTER_PALETTES.length;
+  return POSTER_PALETTES[index];
+}
+function createPoster(title, year, genre) {
+  const [bg, accent, highlight] = getPalette(title);
+  const safeTitle = escapeSvgText(title);
+  const safeGenre = escapeSvgText(genre.slice(0, 2).join(" / "));
+  return toDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${bg}" />
+          <stop offset="55%" stop-color="${accent}" />
+          <stop offset="100%" stop-color="${highlight}" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="600" fill="url(#bg)" />
+      <circle cx="320" cy="120" r="110" fill="rgba(255,255,255,0.12)" />
+      <circle cx="90" cy="510" r="140" fill="rgba(255,255,255,0.08)" />
+      <rect x="32" y="32" width="336" height="536" rx="28" fill="none" stroke="rgba(255,255,255,0.28)" />
+      <text x="40" y="92" fill="white" font-family="Georgia, serif" font-size="28" opacity="0.78">${safeGenre}</text>
+      <text x="40" y="410" fill="white" font-family="Georgia, serif" font-size="54" font-weight="700">
+        <tspan x="40" dy="0">${safeTitle}</tspan>
+      </text>
+      <text x="40" y="520" fill="white" font-family="Arial, sans-serif" font-size="24" opacity="0.85">${year}</text>
+    </svg>
+  `);
+}
+function createBackdrop(title, director) {
+  const [bg, accent, highlight] = getPalette(`${title}-${director}`);
+  const safeTitle = escapeSvgText(title);
+  const safeDirector = escapeSvgText(director);
+  return toDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="${bg}" />
+          <stop offset="55%" stop-color="${accent}" />
+          <stop offset="100%" stop-color="${highlight}" />
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="400" fill="url(#bg)" />
+      <circle cx="980" cy="120" r="160" fill="rgba(255,255,255,0.14)" />
+      <circle cx="220" cy="330" r="180" fill="rgba(255,255,255,0.08)" />
+      <text x="72" y="210" fill="white" font-family="Georgia, serif" font-size="64" font-weight="700">${safeTitle}</text>
+      <text x="72" y="258" fill="rgba(255,255,255,0.82)" font-family="Arial, sans-serif" font-size="28">Directed by ${safeDirector}</text>
+    </svg>
+  `);
+}
+const MOCK_MOVIES = [
+  {
+    id: "1",
+    title: "Eternal Shadows",
+    year: 2024,
+    genre: ["Sci-Fi", "Thriller"],
+    director: "Emma Torres",
+    synopsis: "In a world where memories can be extracted and sold, a detective must navigate through layers of stolen consciousness to solve a murder that never happened.",
+    poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=400&fit=crop",
+    rating: 8.7,
+    duration: 142,
+    popularity: 95,
+    cast: ["Sarah Chen", "Marcus Reid", "David Park"]
+  },
+  {
+    id: "2",
+    title: "The Last Sunset",
+    year: 2023,
+    genre: ["Drama", "Romance"],
+    director: "James Wilson",
+    synopsis: "Two strangers meet during the final sunset before eternal darkness falls on Earth, sharing their last hours together in unexpected companionship.",
+    poster: "https://images.unsplash.com/photo-1594908900066-3f47337549d8?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&h=400&fit=crop",
+    rating: 9.1,
+    duration: 118,
+    popularity: 88,
+    cast: ["Lisa Morgan", "Tom Anderson"]
+  },
+  {
+    id: "3",
+    title: "Neon Dreams",
+    year: 2024,
+    genre: ["Action", "Cyberpunk"],
+    director: "Yuki Tanaka",
+    synopsis: "A hacker in Neo-Tokyo discovers a conspiracy that threatens to merge human consciousness with artificial intelligence.",
+    poster: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1200&h=400&fit=crop",
+    rating: 8.4,
+    duration: 135,
+    popularity: 92,
+    cast: ["Kenji Yamamoto", "Ai Sato", "Ryan Lee"]
+  },
+  {
+    id: "4",
+    title: "Whispers in the Wind",
+    year: 2023,
+    genre: ["Fantasy", "Adventure"],
+    director: "Sofia Martinez",
+    synopsis: "A young musician discovers she can hear the voices of the past through ancient melodies, leading her on a journey to prevent a forgotten catastrophe.",
+    poster: "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&h=400&fit=crop",
+    rating: 8.9,
+    duration: 128,
+    popularity: 85,
+    cast: ["Elena Rodriguez", "Michael Brown"]
+  },
+  {
+    id: "5",
+    title: "The Crimson Void",
+    year: 2024,
+    genre: ["Horror", "Mystery"],
+    director: "Alex Chen",
+    synopsis: "An abandoned space station holds dark secrets as a rescue team discovers that isolation can manifest nightmares into reality.",
+    poster: "https://images.unsplash.com/photo-1574267432644-f2f4e4a19ae0?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=400&fit=crop",
+    rating: 7.8,
+    duration: 115,
+    popularity: 78,
+    cast: ["Jessica Kim", "Robert Taylor", "Nina Patel"]
+  },
+  {
+    id: "6",
+    title: "Atlas of Dreams",
+    year: 2023,
+    genre: ["Animation", "Family"],
+    director: "Pierre Dubois",
+    synopsis: "A magical atlas transports a curious child to breathtaking worlds where imagination and reality blend seamlessly.",
+    poster: "https://images.unsplash.com/photo-1611604548018-d56bbd85d681?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=400&fit=crop",
+    rating: 8.6,
+    duration: 98,
+    popularity: 90,
+    cast: ["Voice: Emma Stone", "Voice: Chris Pratt"]
+  },
+  {
+    id: "7",
+    title: "Silent Protocol",
+    year: 2024,
+    genre: ["Thriller", "Action"],
+    director: "Marcus Stone",
+    synopsis: "A special forces operative goes rogue to expose a government conspiracy, racing against time before being silenced forever.",
+    poster: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1200&h=400&fit=crop",
+    rating: 8.2,
+    duration: 125,
+    popularity: 87,
+    cast: ["Jake Morrison", "Anna White", "Carlos Mendez"]
+  },
+  {
+    id: "8",
+    title: "Echoes of Tomorrow",
+    year: 2023,
+    genre: ["Sci-Fi", "Drama"],
+    director: "Lin Wei",
+    synopsis: "Scientists receive messages from the future, only to realize their attempts to change the timeline create the very catastrophe they sought to prevent.",
+    poster: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1200&h=400&fit=crop",
+    rating: 9,
+    duration: 148,
+    popularity: 93,
+    cast: ["Wei Zhang", "Sophie Laurent", "Daniel Kim"]
+  }
+].map((movie) => ({
+  ...movie,
+  poster: createPoster(movie.title, movie.year, movie.genre),
+  backdrop: createBackdrop(movie.title, movie.director)
+}));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+function mapFilmDetail(item) {
+  return {
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    releaseYear: item.releaseYear ?? item.release_year ?? 0,
+    producingCountry: item.producingCountry ?? item.producing_country ?? "",
+    rating: item.rating,
+    poster: item.poster
+  };
+}
+const filmService = {
+  async searchMovies(filters = {}) {
+    await delay(400);
+    let results = [...MOCK_MOVIES];
+    if (filters.query) {
+      const query = filters.query.toLowerCase();
+      results = results.filter(
+        (movie) => movie.title.toLowerCase().includes(query) || movie.synopsis.toLowerCase().includes(query) || movie.director.toLowerCase().includes(query)
+      );
+    }
+    if (filters.genre) {
+      results = results.filter((movie) => movie.genre.includes(filters.genre));
+    }
+    if (filters.year) {
+      results = results.filter((movie) => movie.year === filters.year);
+    }
+    if (filters.minRating) {
+      results = results.filter((movie) => movie.rating >= filters.minRating);
+    }
+    if (filters.sortBy) {
+      results.sort((a, b) => {
+        switch (filters.sortBy) {
+          case "popularity":
+            return b.popularity - a.popularity;
+          case "rating":
+            return b.rating - a.rating;
+          case "year":
+            return b.year - a.year;
+          case "title":
+            return a.title.localeCompare(b.title);
+          default:
+            return 0;
+        }
+      });
+    }
+    return results;
+  },
+  async getMovieById(id) {
+    await delay(300);
+    return MOCK_MOVIES.find((movie) => movie.id === id) || null;
+  },
+  async getFilmById(id) {
+    var _a;
+    const normalizedId = id.trim();
+    if (!normalizedId) {
+      return null;
+    }
+    const response = await apiFetch(`/api/catalog/films/${normalizedId}`, {
+      method: "GET",
+      auth: "required",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    const payload = await parseJsonSafely$1(response);
+    if (!response.ok) {
+      const errorMessage = (payload == null ? void 0 : payload.message) ?? (payload == null ? void 0 : payload.error) ?? `Film detail failed with status ${response.status}`;
+      throw new Error(errorMessage);
+    }
+    if (!((_a = payload == null ? void 0 : payload.data) == null ? void 0 : _a.id)) {
+      return null;
+    }
+    return mapFilmDetail(payload.data);
+  },
+  async getFeaturedMovies() {
+    await delay(400);
+    return MOCK_MOVIES.slice(0, 4);
+  },
+  async getGenres() {
+    const genres = /* @__PURE__ */ new Set();
+    MOCK_MOVIES.forEach((movie) => {
+      movie.genre.forEach((g) => genres.add(g));
+    });
+    return Array.from(genres).sort();
+  }
+};
 const COLLECTION_CONDITION_OPTIONS = [
   "Mint",
   "NearMint",
@@ -4025,7 +4450,7 @@ function buildCollectionMutationPayload(request) {
   };
 }
 async function extractPayloadOrError(response, fallbackMessage) {
-  const payload = await parseJsonSafely(response);
+  const payload = await parseJsonSafely$1(response);
   if (response.ok) {
     return payload;
   }
@@ -4414,6 +4839,20 @@ function CollectionItemDialog({
 function formatReleaseYear(year) {
   return year > 0 ? String(year) : "Unknown year";
 }
+function formatEditionValue(value) {
+  if (!value.trim()) {
+    return "";
+  }
+  return value.replace(/[_-]+/g, " ").toLowerCase().replace(/\b\w/g, (match) => match.toUpperCase());
+}
+function buildEditionLabel(release) {
+  const primaryParts = [formatEditionValue(release.format) || "Edition", formatEditionValue(release.packagingType)].filter(Boolean);
+  return primaryParts.join(" / ") || "Edition Detail";
+}
+function buildEditionSummary(release) {
+  const parts = [release.country || "Unknown country", formatReleaseYear(release.releaseYear), release.verified ? "Verified archive record" : "Archive record pending verification"];
+  return parts.join(" / ");
+}
 function formatUploadedAt(value) {
   if (!value) {
     return "Unknown upload date";
@@ -4438,6 +4877,7 @@ function ReleaseDetail() {
   const location = useLocation();
   const locationState = location.state;
   const [release, setRelease] = useState(null);
+  const [film, setFilm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [itemDialogError, setItemDialogError] = useState("");
@@ -4455,7 +4895,7 @@ function ReleaseDetail() {
   useEffect(() => {
     if (!slug || !resolvedEditionId) {
       setLoading(false);
-      setError("The edition id could not be resolved from this slug. Open the release from the catalog search results first.");
+      setError("This release could not be opened from the current link. Try returning to the catalog and opening it again.");
       return;
     }
     let active = true;
@@ -4465,10 +4905,12 @@ function ReleaseDetail() {
       setError("");
       try {
         const [detail, collectionState] = await Promise.all([catalogService.getEditionById(resolvedEditionId), collectionService.isEditionInCollection(resolvedEditionId)]);
+        const filmDetail = detail.filmId ? await filmService.getFilmById(detail.filmId) : null;
         if (!active) {
           return;
         }
         setRelease(detail);
+        setFilm(filmDetail);
         setIsInCollection(collectionState);
         setActivePictureId(detail.coverPictureId || ((_a2 = detail.pictures[0]) == null ? void 0 : _a2.id) || "");
       } catch (detailError) {
@@ -4477,6 +4919,7 @@ function ReleaseDetail() {
         }
         setError(detailError instanceof Error ? detailError.message : "Release detail could not be loaded");
         setRelease(null);
+        setFilm(null);
       } finally {
         if (active) {
           setLoading(false);
@@ -4550,9 +4993,13 @@ function ReleaseDetail() {
       })]
     });
   }
+  const filmTitle = (film == null ? void 0 : film.title) || "Film data unavailable";
+  const filmYear = (film == null ? void 0 : film.releaseYear) ? String(film.releaseYear) : "Not available";
+  const releaseLabel = buildEditionLabel(release);
+  const releaseSummary = buildEditionSummary(release);
   return /* @__PURE__ */ jsxs(Fragment, {
     children: [/* @__PURE__ */ jsx(Navbar, {}), /* @__PURE__ */ jsx("div", {
-      className: "min-h-screen bg-[radial-gradient(circle_at_top,_rgba(191,219,254,0.18),_transparent_35%),linear-gradient(180deg,rgba(15,23,42,0.98),rgba(2,6,23,1))] text-slate-50",
+      className: "min-h-screen bg-[radial-gradient(circle_at_top,rgba(191,163,122,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(138,129,120,0.12),transparent_18%),linear-gradient(180deg,rgba(251,245,236,0.98),rgba(239,230,216,1))] text-foreground dark:bg-[radial-gradient(circle_at_top,rgba(191,163,122,0.1),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(138,129,120,0.12),transparent_18%),linear-gradient(180deg,rgba(38,38,38,0.98),rgba(20,20,20,1))]",
       children: /* @__PURE__ */ jsxs("div", {
         className: "mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8",
         children: [/* @__PURE__ */ jsxs("div", {
@@ -4560,42 +5007,144 @@ function ReleaseDetail() {
           children: [/* @__PURE__ */ jsx(Button, {
             asChild: true,
             variant: "outline",
-            className: "border-slate-700 bg-slate-950/40 text-slate-100 hover:bg-slate-900",
+            className: "border-border bg-card/80 text-foreground hover:bg-secondary",
             children: /* @__PURE__ */ jsxs(Link, {
               to: "/catalog",
               children: [/* @__PURE__ */ jsx(ArrowLeft, {
                 className: "h-4 w-4"
               }), "Back to catalog"]
             })
-          }), /* @__PURE__ */ jsxs("div", {
+          }), /* @__PURE__ */ jsx("div", {
             className: "flex flex-wrap gap-2",
-            children: [/* @__PURE__ */ jsxs(Badge, {
-              className: "border-emerald-500/30 bg-emerald-500/15 text-emerald-200",
+            children: /* @__PURE__ */ jsxs(Badge, {
+              className: release.verified ? "border-emerald-500/30 bg-emerald-500/12 text-emerald-700 dark:text-emerald-200" : "border-primary/30 bg-primary/15 text-primary dark:text-primary-foreground",
               children: [/* @__PURE__ */ jsx(ShieldCheck, {
                 className: "mr-1 h-3.5 w-3.5"
               }), release.verified ? "Verified release" : "Pending verification"]
-            }), /* @__PURE__ */ jsxs(Badge, {
-              variant: "outline",
-              className: "border-slate-700 bg-slate-900/70 text-slate-200",
-              children: ["Slug: ", release.slug]
-            })]
+            })
           })]
-        }), /* @__PURE__ */ jsx("section", {
-          className: "overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950/70 shadow-[0_30px_120px_rgba(15,23,42,0.55)] backdrop-blur",
-          children: /* @__PURE__ */ jsxs("div", {
+        }), /* @__PURE__ */ jsxs("section", {
+          className: "overflow-hidden rounded-[2rem] border border-border/80 bg-card/86 shadow-[0_32px_100px_rgba(20,20,20,0.12)] backdrop-blur dark:shadow-[0_32px_120px_rgba(0,0,0,0.36)]",
+          children: [/* @__PURE__ */ jsx("div", {
+            className: "border-b border-border/80 bg-[radial-gradient(circle_at_top_left,rgba(191,163,122,0.22),transparent_38%),linear-gradient(180deg,rgba(246,239,228,0.96),rgba(239,230,216,0.94))] p-6 sm:p-8 lg:p-10 dark:bg-[radial-gradient(circle_at_top_left,rgba(191,163,122,0.12),transparent_34%),linear-gradient(180deg,rgba(38,38,38,0.96),rgba(27,27,27,0.94))]",
+            children: /* @__PURE__ */ jsx("div", {
+              className: "grid gap-8",
+              children: /* @__PURE__ */ jsxs("div", {
+                className: "space-y-5",
+                children: [/* @__PURE__ */ jsxs("div", {
+                  className: "flex flex-wrap items-center gap-3",
+                  children: [/* @__PURE__ */ jsx(Badge, {
+                    className: "border-primary/30 bg-primary/15 text-primary-foreground",
+                    children: formatEditionValue(release.format) || "Unknown format"
+                  }), release.packagingType && /* @__PURE__ */ jsxs(Badge, {
+                    variant: "outline",
+                    className: "border-border bg-background/75 text-muted-foreground",
+                    children: [/* @__PURE__ */ jsx(Package2, {
+                      className: "mr-1 h-3.5 w-3.5"
+                    }), formatEditionValue(release.packagingType)]
+                  }), (film == null ? void 0 : film.rating) && /* @__PURE__ */ jsxs(Badge, {
+                    variant: "outline",
+                    className: "border-border bg-background/75 text-muted-foreground",
+                    children: [/* @__PURE__ */ jsx(Star, {
+                      className: "mr-1 h-3.5 w-3.5"
+                    }), "Rated ", film.rating]
+                  })]
+                }), /* @__PURE__ */ jsxs("div", {
+                  className: "space-y-3",
+                  children: [/* @__PURE__ */ jsx("p", {
+                    className: "text-sm uppercase tracking-[0.24em] text-muted-foreground",
+                    children: "Film"
+                  }), /* @__PURE__ */ jsx("h1", {
+                    className: "text-4xl font-black tracking-tight sm:text-5xl",
+                    children: filmTitle
+                  }), /* @__PURE__ */ jsx("p", {
+                    className: "text-lg text-muted-foreground",
+                    children: releaseLabel
+                  }), /* @__PURE__ */ jsxs("div", {
+                    className: "flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground",
+                    children: [/* @__PURE__ */ jsx("span", {
+                      children: filmYear
+                    }), /* @__PURE__ */ jsx("span", {
+                      children: (film == null ? void 0 : film.rating) ? `Rated ${film.rating}` : "Rating not available"
+                    })]
+                  })]
+                }), /* @__PURE__ */ jsx("p", {
+                  className: "max-w-3xl text-base leading-7 text-muted-foreground",
+                  children: (film == null ? void 0 : film.description) || "Archive view for this physical edition, with its gallery, packaging details, barcode, and collection actions in one place."
+                }), /* @__PURE__ */ jsxs("div", {
+                  className: "grid gap-3 sm:grid-cols-2 xl:grid-cols-4",
+                  children: [/* @__PURE__ */ jsxs("div", {
+                    className: "rounded-2xl border border-border/80 bg-background/80 p-4",
+                    children: [/* @__PURE__ */ jsx("p", {
+                      className: "text-xs uppercase tracking-[0.22em] text-muted-foreground",
+                      children: "Film Title"
+                    }), /* @__PURE__ */ jsx("p", {
+                      className: "mt-3 text-lg font-semibold text-foreground",
+                      children: filmTitle
+                    })]
+                  }), /* @__PURE__ */ jsxs("div", {
+                    className: "rounded-2xl border border-border/80 bg-background/80 p-4",
+                    children: [/* @__PURE__ */ jsx("p", {
+                      className: "text-xs uppercase tracking-[0.22em] text-muted-foreground",
+                      children: "Film Year"
+                    }), /* @__PURE__ */ jsx("p", {
+                      className: "mt-3 text-lg font-semibold text-foreground",
+                      children: filmYear
+                    })]
+                  }), /* @__PURE__ */ jsxs("div", {
+                    className: "rounded-2xl border border-border/80 bg-background/80 p-4",
+                    children: [/* @__PURE__ */ jsx("p", {
+                      className: "text-xs uppercase tracking-[0.22em] text-muted-foreground",
+                      children: "Film Rating"
+                    }), /* @__PURE__ */ jsx("p", {
+                      className: "mt-3 text-lg font-semibold text-foreground",
+                      children: (film == null ? void 0 : film.rating) || "Not available"
+                    })]
+                  })]
+                }), /* @__PURE__ */ jsxs("div", {
+                  className: "flex flex-wrap gap-3 pt-2",
+                  children: [isInCollection ? /* @__PURE__ */ jsxs(Button, {
+                    size: "lg",
+                    disabled: true,
+                    className: "gap-2",
+                    children: [/* @__PURE__ */ jsx(Check, {
+                      className: "h-5 w-5"
+                    }), "Already in collection"]
+                  }) : /* @__PURE__ */ jsxs(Button, {
+                    size: "lg",
+                    onClick: () => setIsItemDialogOpen(true),
+                    disabled: addingToCollection,
+                    className: "gap-2",
+                    children: [/* @__PURE__ */ jsx(Plus, {
+                      className: "h-5 w-5"
+                    }), "Add edition to collection"]
+                  }), /* @__PURE__ */ jsx(Button, {
+                    asChild: true,
+                    size: "lg",
+                    variant: "outline",
+                    className: "border-border bg-background/70 text-foreground hover:bg-secondary",
+                    children: /* @__PURE__ */ jsx(Link, {
+                      to: "/collection",
+                      children: "Open collection"
+                    })
+                  })]
+                })]
+              })
+            })
+          }), /* @__PURE__ */ jsxs("div", {
             className: "grid gap-0 lg:grid-cols-[minmax(320px,420px)_1fr]",
             children: [/* @__PURE__ */ jsxs("div", {
-              className: "border-b border-slate-800 bg-slate-900/70 p-6 lg:border-b-0 lg:border-r",
+              className: "border-b border-border/80 bg-[radial-gradient(circle_at_top,rgba(191,163,122,0.16),transparent_38%),rgba(244,235,223,0.92)] p-6 lg:border-b-0 lg:border-r dark:bg-[radial-gradient(circle_at_top,rgba(191,163,122,0.1),transparent_34%),rgba(27,27,27,0.92)]",
               children: [/* @__PURE__ */ jsx("div", {
-                className: "overflow-hidden rounded-[1.5rem] border border-slate-800 bg-slate-900",
+                className: "overflow-hidden rounded-[1.5rem] border border-border/80 bg-background/70",
                 children: /* @__PURE__ */ jsx("div", {
                   className: "aspect-[3/4]",
                   children: activePicture ? /* @__PURE__ */ jsx(ImageWithFallback, {
                     src: activePicture.url,
-                    alt: release.slug,
+                    alt: (film == null ? void 0 : film.title) || buildEditionLabel(release),
                     className: "h-full w-full object-cover"
                   }) : /* @__PURE__ */ jsx("div", {
-                    className: "flex h-full w-full items-center justify-center text-slate-500",
+                    className: "flex h-full w-full items-center justify-center text-muted-foreground",
                     children: /* @__PURE__ */ jsx(ImageIcon, {
                       className: "h-12 w-12"
                     })
@@ -4607,9 +5156,9 @@ function ReleaseDetail() {
                   className: "flex items-center justify-between",
                   children: [/* @__PURE__ */ jsx("h2", {
                     className: "text-lg font-semibold",
-                    children: "Picture archive"
+                    children: "Image gallery"
                   }), /* @__PURE__ */ jsxs("span", {
-                    className: "text-sm text-slate-400",
+                    className: "text-sm text-muted-foreground",
                     children: [release.pictures.length, " file", release.pictures.length === 1 ? "" : "s"]
                   })]
                 }), release.pictures.length > 0 ? /* @__PURE__ */ jsx("div", {
@@ -4619,9 +5168,9 @@ function ReleaseDetail() {
                     return /* @__PURE__ */ jsx("button", {
                       type: "button",
                       onClick: () => setActivePictureId(picture.id),
-                      className: `overflow-hidden rounded-xl border transition ${isActive ? "border-sky-400 shadow-[0_0_0_1px_rgba(56,189,248,0.7)]" : "border-slate-800 hover:border-slate-600"}`,
+                      className: `overflow-hidden rounded-xl border transition ${isActive ? "border-accent shadow-[0_0_0_1px_rgba(191,163,122,0.9)]" : "border-border hover:border-accent/60"}`,
                       children: /* @__PURE__ */ jsx("div", {
-                        className: "aspect-[3/4] bg-slate-900",
+                        className: "aspect-[3/4] bg-background/80",
                         children: /* @__PURE__ */ jsx(ImageWithFallback, {
                           src: picture.url,
                           alt: picture.id,
@@ -4631,7 +5180,7 @@ function ReleaseDetail() {
                     }, picture.id);
                   })
                 }) : /* @__PURE__ */ jsx("div", {
-                  className: "rounded-2xl border border-dashed border-slate-800 px-4 py-6 text-center text-sm text-slate-400",
+                  className: "rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground",
                   children: "No pictures were attached to this release."
                 })]
               })]
@@ -4642,119 +5191,127 @@ function ReleaseDetail() {
                 children: [/* @__PURE__ */ jsxs("div", {
                   className: "space-y-4",
                   children: [/* @__PURE__ */ jsxs("div", {
-                    className: "flex flex-wrap items-center gap-3",
-                    children: [/* @__PURE__ */ jsx(Badge, {
-                      className: "bg-sky-500/15 text-sky-200",
-                      children: release.format || "Unknown format"
-                    }), release.packagingType && /* @__PURE__ */ jsxs(Badge, {
-                      variant: "outline",
-                      className: "border-slate-700 bg-slate-900/70 text-slate-200",
-                      children: [/* @__PURE__ */ jsx(Package2, {
-                        className: "mr-1 h-3.5 w-3.5"
-                      }), release.packagingType]
-                    })]
-                  }), /* @__PURE__ */ jsxs("div", {
                     children: [/* @__PURE__ */ jsx("p", {
-                      className: "text-sm uppercase tracking-[0.22em] text-slate-400",
-                      children: "Edition archive"
-                    }), /* @__PURE__ */ jsx("h1", {
-                      className: "mt-2 text-4xl font-black tracking-tight sm:text-5xl",
-                      children: release.slug
+                      className: "text-sm uppercase tracking-[0.24em] text-muted-foreground",
+                      children: "Edition / Release"
+                    }), /* @__PURE__ */ jsx("h2", {
+                      className: "mt-2 text-2xl font-bold text-foreground",
+                      children: releaseLabel
+                    }), /* @__PURE__ */ jsx("p", {
+                      className: "mt-2 text-sm text-muted-foreground",
+                      children: releaseSummary
                     })]
-                  }), /* @__PURE__ */ jsx("p", {
-                    className: "max-w-3xl text-base leading-7 text-slate-300",
-                    children: "A release-focused detail view built around the backend edition record, with gallery browsing, physical metadata, and verification status surfaced in one place."
                   }), /* @__PURE__ */ jsxs("div", {
-                    className: "flex flex-wrap gap-3 pt-2",
-                    children: [isInCollection ? /* @__PURE__ */ jsxs(Button, {
-                      size: "lg",
-                      disabled: true,
-                      className: "gap-2",
-                      children: [/* @__PURE__ */ jsx(Check, {
-                        className: "h-5 w-5"
-                      }), "Already in collection"]
-                    }) : /* @__PURE__ */ jsxs(Button, {
-                      size: "lg",
-                      onClick: () => setIsItemDialogOpen(true),
-                      disabled: addingToCollection,
-                      className: "gap-2",
-                      children: [/* @__PURE__ */ jsx(Plus, {
-                        className: "h-5 w-5"
-                      }), "Add edition to collection"]
-                    }), /* @__PURE__ */ jsx(Button, {
-                      asChild: true,
-                      size: "lg",
-                      variant: "outline",
-                      className: "border-slate-700 bg-slate-950/40 text-slate-100 hover:bg-slate-900",
-                      children: /* @__PURE__ */ jsx(Link, {
-                        to: "/collection",
-                        children: "Open collection"
-                      })
+                    className: "grid gap-4 md:grid-cols-2 xl:grid-cols-4",
+                    children: [/* @__PURE__ */ jsxs("div", {
+                      className: "rounded-2xl border border-border/80 bg-background/80 p-4",
+                      children: [/* @__PURE__ */ jsxs("div", {
+                        className: "flex items-center gap-2 text-sm text-muted-foreground",
+                        children: [/* @__PURE__ */ jsx(Package2, {
+                          className: "h-4 w-4"
+                        }), "Edition type"]
+                      }), /* @__PURE__ */ jsx("p", {
+                        className: "mt-3 text-lg font-semibold text-foreground",
+                        children: releaseLabel
+                      })]
+                    }), /* @__PURE__ */ jsxs("div", {
+                      className: "rounded-2xl border border-border/80 bg-background/80 p-4",
+                      children: [/* @__PURE__ */ jsxs("div", {
+                        className: "flex items-center gap-2 text-sm text-muted-foreground",
+                        children: [/* @__PURE__ */ jsx(Globe, {
+                          className: "h-4 w-4"
+                        }), "Edition country"]
+                      }), /* @__PURE__ */ jsx("p", {
+                        className: "mt-3 text-lg font-semibold text-foreground",
+                        children: release.country || "Unknown"
+                      })]
+                    }), /* @__PURE__ */ jsxs("div", {
+                      className: "rounded-2xl border border-border/80 bg-background/80 p-4",
+                      children: [/* @__PURE__ */ jsxs("div", {
+                        className: "flex items-center gap-2 text-sm text-muted-foreground",
+                        children: [/* @__PURE__ */ jsx(Calendar, {
+                          className: "h-4 w-4"
+                        }), "Edition year"]
+                      }), /* @__PURE__ */ jsx("p", {
+                        className: "mt-3 text-lg font-semibold text-foreground",
+                        children: formatReleaseYear(release.releaseYear)
+                      })]
+                    }), /* @__PURE__ */ jsxs("div", {
+                      className: "rounded-2xl border border-border/80 bg-background/80 p-4",
+                      children: [/* @__PURE__ */ jsxs("div", {
+                        className: "flex items-center gap-2 text-sm text-muted-foreground",
+                        children: [/* @__PURE__ */ jsx(ShieldCheck, {
+                          className: "h-4 w-4"
+                        }), "Archive status"]
+                      }), /* @__PURE__ */ jsx("p", {
+                        className: "mt-3 text-lg font-semibold text-foreground",
+                        children: release.verified ? "Verified" : "Pending"
+                      })]
                     })]
                   })]
                 }), /* @__PURE__ */ jsxs("div", {
                   className: "grid gap-4 md:grid-cols-2 xl:grid-cols-4",
                   children: [/* @__PURE__ */ jsxs("div", {
-                    className: "rounded-2xl border border-slate-800 bg-slate-900/70 p-4",
+                    className: "rounded-2xl border border-border/80 bg-background/80 p-4",
                     children: [/* @__PURE__ */ jsxs("div", {
-                      className: "flex items-center gap-2 text-sm text-slate-400",
+                      className: "flex items-center gap-2 text-sm text-muted-foreground",
                       children: [/* @__PURE__ */ jsx(ScanLine, {
                         className: "h-4 w-4"
                       }), "Barcode"]
                     }), /* @__PURE__ */ jsx("p", {
-                      className: "mt-3 break-all text-lg font-semibold text-slate-100",
+                      className: "mt-3 break-all text-lg font-semibold text-foreground",
                       children: release.barcode || "Not available"
                     })]
                   }), /* @__PURE__ */ jsxs("div", {
-                    className: "rounded-2xl border border-slate-800 bg-slate-900/70 p-4",
+                    className: "rounded-2xl border border-border/80 bg-background/80 p-4",
                     children: [/* @__PURE__ */ jsxs("div", {
-                      className: "flex items-center gap-2 text-sm text-slate-400",
+                      className: "flex items-center gap-2 text-sm text-muted-foreground",
                       children: [/* @__PURE__ */ jsx(Globe, {
                         className: "h-4 w-4"
-                      }), "Country"]
+                      }), "Format"]
                     }), /* @__PURE__ */ jsx("p", {
-                      className: "mt-3 text-lg font-semibold text-slate-100",
-                      children: release.country || "Unknown"
+                      className: "mt-3 text-lg font-semibold text-foreground",
+                      children: formatEditionValue(release.format) || "Not available"
                     })]
                   }), /* @__PURE__ */ jsxs("div", {
-                    className: "rounded-2xl border border-slate-800 bg-slate-900/70 p-4",
+                    className: "rounded-2xl border border-border/80 bg-background/80 p-4",
                     children: [/* @__PURE__ */ jsxs("div", {
-                      className: "flex items-center gap-2 text-sm text-slate-400",
+                      className: "flex items-center gap-2 text-sm text-muted-foreground",
                       children: [/* @__PURE__ */ jsx(Calendar, {
                         className: "h-4 w-4"
-                      }), "Release year"]
+                      }), "Packaging type"]
                     }), /* @__PURE__ */ jsx("p", {
-                      className: "mt-3 text-lg font-semibold text-slate-100",
-                      children: formatReleaseYear(release.releaseYear)
+                      className: "mt-3 text-lg font-semibold text-foreground",
+                      children: formatEditionValue(release.packagingType) || "Not available"
                     })]
                   }), /* @__PURE__ */ jsxs("div", {
-                    className: "rounded-2xl border border-slate-800 bg-slate-900/70 p-4",
+                    className: "rounded-2xl border border-border/80 bg-background/80 p-4",
                     children: [/* @__PURE__ */ jsxs("div", {
-                      className: "flex items-center gap-2 text-sm text-slate-400",
+                      className: "flex items-center gap-2 text-sm text-muted-foreground",
                       children: [/* @__PURE__ */ jsx(BadgeCheck, {
                         className: "h-4 w-4"
-                      }), "Edition id"]
+                      }), "Picture count"]
                     }), /* @__PURE__ */ jsx("p", {
-                      className: "mt-3 break-all text-lg font-semibold text-slate-100",
-                      children: release.id
+                      className: "mt-3 text-lg font-semibold text-foreground",
+                      children: release.pictures.length
                     })]
                   })]
                 }), /* @__PURE__ */ jsx(Separator, {
-                  className: "bg-slate-800"
+                  className: "bg-border"
                 }), /* @__PURE__ */ jsxs("div", {
-                  className: "grid gap-8 xl:grid-cols-[1.2fr_0.8fr]",
+                  className: "grid gap-8 xl:grid-cols-[1.15fr_0.85fr]",
                   children: [/* @__PURE__ */ jsxs("div", {
                     className: "space-y-4",
                     children: [/* @__PURE__ */ jsx("h2", {
                       className: "text-xl font-semibold",
-                      children: "Collector notes"
+                      children: "Release Notes"
                     }), /* @__PURE__ */ jsx("div", {
-                      className: "rounded-2xl border border-slate-800 bg-slate-900/70 p-5 text-slate-300",
+                      className: "rounded-2xl border border-border/80 bg-background/80 p-5 text-muted-foreground",
                       children: release.notes ? /* @__PURE__ */ jsx("p", {
                         className: "leading-7",
                         children: release.notes
                       }) : /* @__PURE__ */ jsx("p", {
-                        className: "text-slate-500",
+                        className: "text-muted-foreground",
                         children: "No release notes were provided for this edition."
                       })
                     })]
@@ -4762,45 +5319,54 @@ function ReleaseDetail() {
                     className: "space-y-4",
                     children: [/* @__PURE__ */ jsx("h2", {
                       className: "text-xl font-semibold",
-                      children: "Record integrity"
+                      children: "Data Snapshot"
                     }), /* @__PURE__ */ jsx("div", {
-                      className: "rounded-2xl border border-slate-800 bg-slate-900/70 p-5",
+                      className: "rounded-2xl border border-border/80 bg-background/80 p-5",
                       children: /* @__PURE__ */ jsxs("dl", {
                         className: "space-y-4 text-sm",
                         children: [/* @__PURE__ */ jsxs("div", {
                           className: "flex items-start justify-between gap-4",
                           children: [/* @__PURE__ */ jsx("dt", {
-                            className: "text-slate-400",
-                            children: "Film id"
+                            className: "text-muted-foreground",
+                            children: "Film title"
                           }), /* @__PURE__ */ jsx("dd", {
-                            className: "break-all text-right font-medium text-slate-100",
-                            children: release.filmId
+                            className: "text-right font-medium text-foreground",
+                            children: (film == null ? void 0 : film.title) || "Not available"
                           })]
                         }), /* @__PURE__ */ jsxs("div", {
                           className: "flex items-start justify-between gap-4",
                           children: [/* @__PURE__ */ jsx("dt", {
-                            className: "text-slate-400",
+                            className: "text-muted-foreground",
+                            children: "Film year"
+                          }), /* @__PURE__ */ jsx("dd", {
+                            className: "font-medium text-foreground",
+                            children: (film == null ? void 0 : film.releaseYear) ? String(film.releaseYear) : "Not available"
+                          })]
+                        }), /* @__PURE__ */ jsxs("div", {
+                          className: "flex items-start justify-between gap-4",
+                          children: [/* @__PURE__ */ jsx("dt", {
+                            className: "text-muted-foreground",
+                            children: "Rating"
+                          }), /* @__PURE__ */ jsx("dd", {
+                            className: "font-medium text-foreground",
+                            children: (film == null ? void 0 : film.rating) || "Not available"
+                          })]
+                        }), /* @__PURE__ */ jsxs("div", {
+                          className: "flex items-start justify-between gap-4",
+                          children: [/* @__PURE__ */ jsx("dt", {
+                            className: "text-muted-foreground",
                             children: "Verification"
                           }), /* @__PURE__ */ jsx("dd", {
-                            className: "font-medium text-slate-100",
+                            className: "font-medium text-foreground",
                             children: release.verified ? "Verified" : "Not verified"
-                          })]
-                        }), /* @__PURE__ */ jsxs("div", {
-                          className: "flex items-start justify-between gap-4",
-                          children: [/* @__PURE__ */ jsx("dt", {
-                            className: "text-slate-400",
-                            children: "Pictures attached"
-                          }), /* @__PURE__ */ jsx("dd", {
-                            className: "font-medium text-slate-100",
-                            children: release.pictures.length
                           })]
                         }), activePicture && /* @__PURE__ */ jsxs("div", {
                           className: "flex items-start justify-between gap-4",
                           children: [/* @__PURE__ */ jsx("dt", {
-                            className: "text-slate-400",
+                            className: "text-muted-foreground",
                             children: "Active picture uploaded"
                           }), /* @__PURE__ */ jsx("dd", {
-                            className: "text-right font-medium text-slate-100",
+                            className: "text-right font-medium text-foreground",
                             children: formatUploadedAt(activePicture.uploadedAt)
                           })]
                         })]
@@ -4810,7 +5376,7 @@ function ReleaseDetail() {
                 })]
               })
             })]
-          })
+          })]
         })]
       })
     }), /* @__PURE__ */ jsx(CollectionItemDialog, {
@@ -4822,7 +5388,7 @@ function ReleaseDetail() {
         }
       },
       title: "Add Item To Collection",
-      description: "Create the collection item using the real fields exposed by mv-film-service for this edition.",
+      description: "Add this release to your personal collection.",
       submitLabel: "Create item",
       initialValues: getDefaultCollectionItemFormValues(),
       onSubmit: handleAddToCollection,
@@ -4837,244 +5403,6 @@ const route9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   ReleaseDetail,
   default: ReleaseDetail_default
 }, Symbol.toStringTag, { value: "Module" }));
-const POSTER_PALETTES = [
-  ["#081f3f", "#1d4ed8", "#7dd3fc"],
-  ["#2a0b3f", "#7c3aed", "#f0abfc"],
-  ["#1a2e05", "#65a30d", "#bef264"],
-  ["#3f0d0d", "#dc2626", "#fca5a5"],
-  ["#172554", "#0ea5e9", "#fde68a"],
-  ["#3b0764", "#db2777", "#f9a8d4"],
-  ["#111827", "#f59e0b", "#fef3c7"],
-  ["#0f172a", "#14b8a6", "#99f6e4"]
-];
-function escapeSvgText(value) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-}
-function toDataUri(svg) {
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-function getPalette(seed) {
-  const index = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0) % POSTER_PALETTES.length;
-  return POSTER_PALETTES[index];
-}
-function createPoster(title, year, genre) {
-  const [bg, accent, highlight] = getPalette(title);
-  const safeTitle = escapeSvgText(title);
-  const safeGenre = escapeSvgText(genre.slice(0, 2).join(" / "));
-  return toDataUri(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${bg}" />
-          <stop offset="55%" stop-color="${accent}" />
-          <stop offset="100%" stop-color="${highlight}" />
-        </linearGradient>
-      </defs>
-      <rect width="400" height="600" fill="url(#bg)" />
-      <circle cx="320" cy="120" r="110" fill="rgba(255,255,255,0.12)" />
-      <circle cx="90" cy="510" r="140" fill="rgba(255,255,255,0.08)" />
-      <rect x="32" y="32" width="336" height="536" rx="28" fill="none" stroke="rgba(255,255,255,0.28)" />
-      <text x="40" y="92" fill="white" font-family="Georgia, serif" font-size="28" opacity="0.78">${safeGenre}</text>
-      <text x="40" y="410" fill="white" font-family="Georgia, serif" font-size="54" font-weight="700">
-        <tspan x="40" dy="0">${safeTitle}</tspan>
-      </text>
-      <text x="40" y="520" fill="white" font-family="Arial, sans-serif" font-size="24" opacity="0.85">${year}</text>
-    </svg>
-  `);
-}
-function createBackdrop(title, director) {
-  const [bg, accent, highlight] = getPalette(`${title}-${director}`);
-  const safeTitle = escapeSvgText(title);
-  const safeDirector = escapeSvgText(director);
-  return toDataUri(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="${bg}" />
-          <stop offset="55%" stop-color="${accent}" />
-          <stop offset="100%" stop-color="${highlight}" />
-        </linearGradient>
-      </defs>
-      <rect width="1200" height="400" fill="url(#bg)" />
-      <circle cx="980" cy="120" r="160" fill="rgba(255,255,255,0.14)" />
-      <circle cx="220" cy="330" r="180" fill="rgba(255,255,255,0.08)" />
-      <text x="72" y="210" fill="white" font-family="Georgia, serif" font-size="64" font-weight="700">${safeTitle}</text>
-      <text x="72" y="258" fill="rgba(255,255,255,0.82)" font-family="Arial, sans-serif" font-size="28">Directed by ${safeDirector}</text>
-    </svg>
-  `);
-}
-const MOCK_MOVIES = [
-  {
-    id: "1",
-    title: "Eternal Shadows",
-    year: 2024,
-    genre: ["Sci-Fi", "Thriller"],
-    director: "Emma Torres",
-    synopsis: "In a world where memories can be extracted and sold, a detective must navigate through layers of stolen consciousness to solve a murder that never happened.",
-    poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=400&fit=crop",
-    rating: 8.7,
-    duration: 142,
-    popularity: 95,
-    cast: ["Sarah Chen", "Marcus Reid", "David Park"]
-  },
-  {
-    id: "2",
-    title: "The Last Sunset",
-    year: 2023,
-    genre: ["Drama", "Romance"],
-    director: "James Wilson",
-    synopsis: "Two strangers meet during the final sunset before eternal darkness falls on Earth, sharing their last hours together in unexpected companionship.",
-    poster: "https://images.unsplash.com/photo-1594908900066-3f47337549d8?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&h=400&fit=crop",
-    rating: 9.1,
-    duration: 118,
-    popularity: 88,
-    cast: ["Lisa Morgan", "Tom Anderson"]
-  },
-  {
-    id: "3",
-    title: "Neon Dreams",
-    year: 2024,
-    genre: ["Action", "Cyberpunk"],
-    director: "Yuki Tanaka",
-    synopsis: "A hacker in Neo-Tokyo discovers a conspiracy that threatens to merge human consciousness with artificial intelligence.",
-    poster: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1200&h=400&fit=crop",
-    rating: 8.4,
-    duration: 135,
-    popularity: 92,
-    cast: ["Kenji Yamamoto", "Ai Sato", "Ryan Lee"]
-  },
-  {
-    id: "4",
-    title: "Whispers in the Wind",
-    year: 2023,
-    genre: ["Fantasy", "Adventure"],
-    director: "Sofia Martinez",
-    synopsis: "A young musician discovers she can hear the voices of the past through ancient melodies, leading her on a journey to prevent a forgotten catastrophe.",
-    poster: "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&h=400&fit=crop",
-    rating: 8.9,
-    duration: 128,
-    popularity: 85,
-    cast: ["Elena Rodriguez", "Michael Brown"]
-  },
-  {
-    id: "5",
-    title: "The Crimson Void",
-    year: 2024,
-    genre: ["Horror", "Mystery"],
-    director: "Alex Chen",
-    synopsis: "An abandoned space station holds dark secrets as a rescue team discovers that isolation can manifest nightmares into reality.",
-    poster: "https://images.unsplash.com/photo-1574267432644-f2f4e4a19ae0?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=400&fit=crop",
-    rating: 7.8,
-    duration: 115,
-    popularity: 78,
-    cast: ["Jessica Kim", "Robert Taylor", "Nina Patel"]
-  },
-  {
-    id: "6",
-    title: "Atlas of Dreams",
-    year: 2023,
-    genre: ["Animation", "Family"],
-    director: "Pierre Dubois",
-    synopsis: "A magical atlas transports a curious child to breathtaking worlds where imagination and reality blend seamlessly.",
-    poster: "https://images.unsplash.com/photo-1611604548018-d56bbd85d681?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=400&fit=crop",
-    rating: 8.6,
-    duration: 98,
-    popularity: 90,
-    cast: ["Voice: Emma Stone", "Voice: Chris Pratt"]
-  },
-  {
-    id: "7",
-    title: "Silent Protocol",
-    year: 2024,
-    genre: ["Thriller", "Action"],
-    director: "Marcus Stone",
-    synopsis: "A special forces operative goes rogue to expose a government conspiracy, racing against time before being silenced forever.",
-    poster: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1200&h=400&fit=crop",
-    rating: 8.2,
-    duration: 125,
-    popularity: 87,
-    cast: ["Jake Morrison", "Anna White", "Carlos Mendez"]
-  },
-  {
-    id: "8",
-    title: "Echoes of Tomorrow",
-    year: 2023,
-    genre: ["Sci-Fi", "Drama"],
-    director: "Lin Wei",
-    synopsis: "Scientists receive messages from the future, only to realize their attempts to change the timeline create the very catastrophe they sought to prevent.",
-    poster: "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=400&h=600&fit=crop",
-    backdrop: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1200&h=400&fit=crop",
-    rating: 9,
-    duration: 148,
-    popularity: 93,
-    cast: ["Wei Zhang", "Sophie Laurent", "Daniel Kim"]
-  }
-].map((movie) => ({
-  ...movie,
-  poster: createPoster(movie.title, movie.year, movie.genre),
-  backdrop: createBackdrop(movie.title, movie.director)
-}));
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const filmService = {
-  async searchMovies(filters = {}) {
-    await delay(400);
-    let results = [...MOCK_MOVIES];
-    if (filters.query) {
-      const query = filters.query.toLowerCase();
-      results = results.filter(
-        (movie) => movie.title.toLowerCase().includes(query) || movie.synopsis.toLowerCase().includes(query) || movie.director.toLowerCase().includes(query)
-      );
-    }
-    if (filters.genre) {
-      results = results.filter((movie) => movie.genre.includes(filters.genre));
-    }
-    if (filters.year) {
-      results = results.filter((movie) => movie.year === filters.year);
-    }
-    if (filters.minRating) {
-      results = results.filter((movie) => movie.rating >= filters.minRating);
-    }
-    if (filters.sortBy) {
-      results.sort((a, b) => {
-        switch (filters.sortBy) {
-          case "popularity":
-            return b.popularity - a.popularity;
-          case "rating":
-            return b.rating - a.rating;
-          case "year":
-            return b.year - a.year;
-          case "title":
-            return a.title.localeCompare(b.title);
-          default:
-            return 0;
-        }
-      });
-    }
-    return results;
-  },
-  async getMovieById(id) {
-    await delay(300);
-    return MOCK_MOVIES.find((movie) => movie.id === id) || null;
-  },
-  async getFeaturedMovies() {
-    await delay(400);
-    return MOCK_MOVIES.slice(0, 4);
-  },
-  async getGenres() {
-    const genres = /* @__PURE__ */ new Set();
-    MOCK_MOVIES.forEach((movie) => {
-      movie.genre.forEach((g) => genres.add(g));
-    });
-    return Array.from(genres).sort();
-  }
-};
 function MovieDetail() {
   const {
     id
@@ -5182,7 +5510,7 @@ function MovieDetail() {
                   }), /* @__PURE__ */ jsxs("div", {
                     className: "flex items-center gap-2",
                     children: [/* @__PURE__ */ jsx(Star, {
-                      className: "h-5 w-5 fill-yellow-500 text-yellow-500"
+                      className: "h-5 w-5 fill-accent text-accent"
                     }), /* @__PURE__ */ jsxs("span", {
                       className: "font-semibold",
                       children: [movie.rating.toFixed(1), "/10"]
@@ -5248,7 +5576,7 @@ function MovieDetail() {
                 })]
               }), /* @__PURE__ */ jsx("p", {
                 className: "text-sm text-muted-foreground",
-                children: "Collection items are now owned as backend edition records, so collection actions happen from release pages instead of abstract movie records."
+                children: "Collection and ownership details are handled from individual release pages."
               })]
             })]
           })
@@ -5654,7 +5982,7 @@ function Collection() {
         }
       },
       title: "Edit Collection Item",
-      description: "Update the collection metadata stored in mv-film-service for this owned edition.",
+      description: "Update the details for this copy in your collection.",
       submitLabel: "Save changes",
       initialValues: itemFormValues,
       onSubmit: handleEditSubmit,
@@ -5669,323 +5997,6 @@ const route11 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePrope
   __proto__: null,
   Collection,
   default: Collection_default
-}, Symbol.toStringTag, { value: "Module" }));
-function AIContent() {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  useEffect(() => {
-    void loadArticles();
-  }, []);
-  const loadArticles = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const articleData = await iaService.getAllArticles();
-      setArticles(articleData);
-    } catch (loadError) {
-      console.error("Failed to load articles:", loadError);
-      setError("Unable to load AI articles right now.");
-    } finally {
-      setLoading(false);
-    }
-  };
-  const getModelColor = (model) => {
-    switch (model) {
-      case "Gemini 2.5 Flash":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-      default:
-        return "bg-primary/10 text-primary border-primary/20";
-    }
-  };
-  return /* @__PURE__ */ jsxs(Fragment, {
-    children: [/* @__PURE__ */ jsx(Navbar, {}), /* @__PURE__ */ jsxs("div", {
-      className: "min-h-screen bg-background",
-      children: [/* @__PURE__ */ jsx("div", {
-        className: "border-b border-border bg-[linear-gradient(135deg,rgba(193,18,31,0.12),rgba(9,9,10,0.96)_42%,rgba(9,9,10,1))]",
-        children: /* @__PURE__ */ jsxs("div", {
-          className: "mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8",
-          children: [/* @__PURE__ */ jsxs("div", {
-            className: "mb-4 flex items-center gap-4",
-            children: [/* @__PURE__ */ jsx("div", {
-              className: "flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10",
-              children: /* @__PURE__ */ jsx(Brain, {
-                className: "h-8 w-8 text-primary"
-              })
-            }), /* @__PURE__ */ jsxs("div", {
-              children: [/* @__PURE__ */ jsx("h1", {
-                className: "text-3xl font-bold",
-                children: "AI-Generated Content"
-              }), /* @__PURE__ */ jsx("p", {
-                className: "mt-1 text-muted-foreground",
-                children: "Editorial posts generated from newly created editions"
-              })]
-            })]
-          }), /* @__PURE__ */ jsx("div", {
-            className: "max-w-3xl rounded-xl border border-primary/30 bg-primary/5 p-4",
-            children: /* @__PURE__ */ jsxs("div", {
-              className: "flex items-start gap-3",
-              children: [/* @__PURE__ */ jsx(Sparkles, {
-                className: "mt-0.5 h-5 w-5 flex-shrink-0 text-primary"
-              }), /* @__PURE__ */ jsx("div", {
-                className: "text-sm text-foreground",
-                children: "New edition creation events trigger article generation in the IA service. This page lists the real posts stored by that backend."
-              })]
-            })
-          })]
-        })
-      }), /* @__PURE__ */ jsx("div", {
-        className: "mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8",
-        children: loading ? /* @__PURE__ */ jsx("div", {
-          className: "flex items-center justify-center py-20",
-          children: /* @__PURE__ */ jsx(Loader2, {
-            className: "h-8 w-8 animate-spin text-primary"
-          })
-        }) : error ? /* @__PURE__ */ jsxs("div", {
-          className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center",
-          children: [/* @__PURE__ */ jsx("h3", {
-            className: "text-xl font-semibold",
-            children: "Could not load AI content"
-          }), /* @__PURE__ */ jsx("p", {
-            className: "mt-2 text-muted-foreground",
-            children: error
-          }), /* @__PURE__ */ jsx(Button, {
-            variant: "outline",
-            className: "mt-4",
-            onClick: () => void loadArticles(),
-            children: "Retry"
-          })]
-        }) : articles.length > 0 ? /* @__PURE__ */ jsx("div", {
-          className: "space-y-6",
-          children: articles.map((article) => /* @__PURE__ */ jsx("article", {
-            className: "overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10",
-            children: /* @__PURE__ */ jsxs("div", {
-              className: "flex flex-col gap-6 p-6 sm:flex-row",
-              children: [article.imageUrl ? /* @__PURE__ */ jsx("div", {
-                className: "flex-shrink-0",
-                children: /* @__PURE__ */ jsx(ImageWithFallback, {
-                  src: article.imageUrl,
-                  alt: article.title,
-                  className: "h-auto w-full rounded-lg object-cover sm:w-40"
-                })
-              }) : null, /* @__PURE__ */ jsxs("div", {
-                className: "min-w-0 flex-1 space-y-4",
-                children: [/* @__PURE__ */ jsxs("div", {
-                  className: "space-y-2",
-                  children: [/* @__PURE__ */ jsxs("div", {
-                    className: "flex flex-wrap items-center gap-2",
-                    children: [/* @__PURE__ */ jsx(Badge, {
-                      variant: "outline",
-                      className: getModelColor(article.model),
-                      children: article.model
-                    }), /* @__PURE__ */ jsx("span", {
-                      className: "text-xs text-muted-foreground",
-                      children: new Date(article.generatedAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric"
-                      })
-                    }), /* @__PURE__ */ jsx("span", {
-                      className: "text-xs text-muted-foreground",
-                      children: "•"
-                    }), /* @__PURE__ */ jsxs("span", {
-                      className: "text-xs text-muted-foreground",
-                      children: [article.readTime, " min read"]
-                    })]
-                  }), /* @__PURE__ */ jsx(Link, {
-                    to: `/ai-content/${article.slug}`,
-                    className: "block",
-                    children: /* @__PURE__ */ jsx("h2", {
-                      className: "text-2xl font-bold transition-colors hover:text-primary",
-                      children: article.title
-                    })
-                  })]
-                }), /* @__PURE__ */ jsx("p", {
-                  className: "line-clamp-3 leading-relaxed text-muted-foreground",
-                  children: article.excerpt
-                }), /* @__PURE__ */ jsx("div", {
-                  className: "flex flex-wrap gap-2",
-                  children: article.tags.map((tag) => /* @__PURE__ */ jsx(Badge, {
-                    variant: "secondary",
-                    className: "text-xs",
-                    children: tag
-                  }, tag))
-                }), /* @__PURE__ */ jsxs("div", {
-                  className: "flex flex-wrap gap-3",
-                  children: [/* @__PURE__ */ jsx(Button, {
-                    asChild: true,
-                    children: /* @__PURE__ */ jsx(Link, {
-                      to: `/ai-content/${article.slug}`,
-                      children: "Read article"
-                    })
-                  }), article.productUrl ? /* @__PURE__ */ jsx(Button, {
-                    asChild: true,
-                    variant: "outline",
-                    children: /* @__PURE__ */ jsxs("a", {
-                      href: article.productUrl,
-                      target: "_blank",
-                      rel: "noreferrer",
-                      children: ["Open shop", /* @__PURE__ */ jsx(ExternalLink, {
-                        className: "h-4 w-4"
-                      })]
-                    })
-                  }) : null]
-                })]
-              })]
-            })
-          }, article.id))
-        }) : /* @__PURE__ */ jsxs("div", {
-          className: "flex flex-col items-center justify-center py-20 text-center",
-          children: [/* @__PURE__ */ jsx(Brain, {
-            className: "mb-4 h-16 w-16 text-muted-foreground"
-          }), /* @__PURE__ */ jsx("h3", {
-            className: "mb-2 text-xl font-semibold",
-            children: "No articles available"
-          }), /* @__PURE__ */ jsx("p", {
-            className: "text-muted-foreground",
-            children: "Articles generated from edition creation events will appear here."
-          })]
-        })
-      })]
-    })]
-  });
-}
-const AIContent_default = UNSAFE_withComponentProps(AIContent);
-const route12 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  AIContent,
-  default: AIContent_default
-}, Symbol.toStringTag, { value: "Module" }));
-function AIArticleDetail() {
-  const {
-    slug
-  } = useParams();
-  const [article, setArticle] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  useEffect(() => {
-    if (!slug) {
-      setLoading(false);
-      setError("Article not found.");
-      return;
-    }
-    void loadArticle(slug);
-  }, [slug]);
-  const loadArticle = async (articleSlug) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const articleData = await iaService.getArticleBySlug(articleSlug);
-      if (!articleData) {
-        setError("Article not found.");
-      } else {
-        setArticle(articleData);
-      }
-    } catch (loadError) {
-      console.error("Failed to load article:", loadError);
-      setError("Unable to load this AI article right now.");
-    } finally {
-      setLoading(false);
-    }
-  };
-  return /* @__PURE__ */ jsxs(Fragment, {
-    children: [/* @__PURE__ */ jsx(Navbar, {}), /* @__PURE__ */ jsx("div", {
-      className: "min-h-screen bg-background",
-      children: /* @__PURE__ */ jsx("div", {
-        className: "border-b border-border bg-[linear-gradient(135deg,rgba(193,18,31,0.12),rgba(9,9,10,0.96)_42%,rgba(9,9,10,1))]",
-        children: /* @__PURE__ */ jsxs("div", {
-          className: "mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8",
-          children: [/* @__PURE__ */ jsx(Button, {
-            asChild: true,
-            variant: "ghost",
-            className: "mb-4 -ml-4",
-            children: /* @__PURE__ */ jsxs(Link, {
-              to: "/ai-content",
-              children: [/* @__PURE__ */ jsx(ArrowLeft, {
-                className: "h-4 w-4"
-              }), "Back to AI content"]
-            })
-          }), loading ? /* @__PURE__ */ jsx("div", {
-            className: "flex items-center justify-center py-16",
-            children: /* @__PURE__ */ jsx(Loader2, {
-              className: "h-8 w-8 animate-spin text-primary"
-            })
-          }) : error || !article ? /* @__PURE__ */ jsxs("div", {
-            className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center",
-            children: [/* @__PURE__ */ jsx("h2", {
-              className: "text-2xl font-bold",
-              children: "Article unavailable"
-            }), /* @__PURE__ */ jsx("p", {
-              className: "mt-2 text-muted-foreground",
-              children: error ?? "This article could not be found."
-            })]
-          }) : /* @__PURE__ */ jsxs("div", {
-            className: "space-y-6",
-            children: [/* @__PURE__ */ jsxs("div", {
-              className: "flex flex-wrap items-center gap-2",
-              children: [/* @__PURE__ */ jsx(Badge, {
-                variant: "outline",
-                className: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-                children: article.model
-              }), /* @__PURE__ */ jsxs(Badge, {
-                variant: "secondary",
-                children: [article.readTime, " min read"]
-              }), /* @__PURE__ */ jsx("span", {
-                className: "text-sm text-muted-foreground",
-                children: new Date(article.generatedAt).toLocaleDateString()
-              })]
-            }), /* @__PURE__ */ jsxs("div", {
-              className: "space-y-3",
-              children: [/* @__PURE__ */ jsx("h1", {
-                className: "text-4xl font-bold",
-                children: article.title
-              }), /* @__PURE__ */ jsx("p", {
-                className: "max-w-3xl text-muted-foreground",
-                children: "Generated automatically from an edition creation event and stored by the IA service."
-              })]
-            }), article.imageUrl ? /* @__PURE__ */ jsx("div", {
-              className: "overflow-hidden rounded-2xl border border-border",
-              children: /* @__PURE__ */ jsx(ImageWithFallback, {
-                src: article.imageUrl,
-                alt: article.title,
-                className: "h-[320px] w-full object-cover"
-              })
-            }) : null, /* @__PURE__ */ jsx(AIArticleBlock, {
-              article
-            }), /* @__PURE__ */ jsxs("div", {
-              className: "flex flex-wrap gap-3",
-              children: [article.productUrl ? /* @__PURE__ */ jsx(Button, {
-                asChild: true,
-                children: /* @__PURE__ */ jsxs("a", {
-                  href: article.productUrl,
-                  target: "_blank",
-                  rel: "noreferrer",
-                  children: ["Open edition in shop", /* @__PURE__ */ jsx(ExternalLink, {
-                    className: "h-4 w-4"
-                  })]
-                })
-              }) : null, /* @__PURE__ */ jsx(Button, {
-                asChild: true,
-                variant: "outline",
-                children: /* @__PURE__ */ jsxs(Link, {
-                  to: "/ai-content",
-                  children: [/* @__PURE__ */ jsx(Sparkles, {
-                    className: "h-4 w-4"
-                  }), "More AI articles"]
-                })
-              })]
-            })]
-          })]
-        })
-      })
-    })]
-  });
-}
-const AIArticleDetail_default = UNSAFE_withComponentProps(AIArticleDetail);
-const route13 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  AIArticleDetail,
-  default: AIArticleDetail_default
 }, Symbol.toStringTag, { value: "Module" }));
 function RankingCard({ entry: entry2, highlight = false }) {
   const getTrendIcon = () => {
@@ -6002,9 +6013,9 @@ function RankingCard({ entry: entry2, highlight = false }) {
     return "-";
   };
   const getRankColor = () => {
-    if (entry2.rank === 1) return "text-yellow-500";
-    if (entry2.rank === 2) return "text-gray-400";
-    if (entry2.rank === 3) return "text-amber-700";
+    if (entry2.rank === 1) return "text-accent";
+    if (entry2.rank === 2) return "text-muted-foreground";
+    if (entry2.rank === 3) return "text-primary";
     return "text-muted-foreground";
   };
   return /* @__PURE__ */ jsxs(
@@ -6140,15 +6151,15 @@ function Ranking() {
     children: [/* @__PURE__ */ jsx(Navbar, {}), /* @__PURE__ */ jsxs("div", {
       className: "min-h-screen bg-background",
       children: [/* @__PURE__ */ jsx("div", {
-        className: "border-b border-border bg-[linear-gradient(135deg,rgba(140,106,67,0.22),rgba(9,9,10,0.96)_46%,rgba(9,9,10,1))]",
+        className: "border-b border-border bg-[linear-gradient(135deg,rgba(191,163,122,0.28),rgba(246,239,228,0.96)_46%,rgba(239,230,216,1))] dark:bg-[linear-gradient(135deg,rgba(191,163,122,0.14),rgba(38,38,38,0.98)_46%,rgba(20,20,20,1))]",
         children: /* @__PURE__ */ jsx("div", {
           className: "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12",
           children: /* @__PURE__ */ jsxs("div", {
             className: "flex items-center gap-4",
             children: [/* @__PURE__ */ jsx("div", {
-              className: "flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8c6a43]/15",
+              className: "flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20",
               children: /* @__PURE__ */ jsx(Trophy, {
-                className: "h-8 w-8 text-[#8c6a43]"
+                className: "h-8 w-8 text-primary dark:text-accent"
               })
             }), /* @__PURE__ */ jsxs("div", {
               children: [/* @__PURE__ */ jsx("h1", {
@@ -6322,7 +6333,7 @@ function Ranking() {
   });
 }
 const Ranking_default = UNSAFE_withComponentProps(Ranking);
-const route14 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route12 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   Ranking,
   default: Ranking_default
@@ -6330,6 +6341,10 @@ const route14 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePrope
 function Settings() {
   const navigate = useNavigate();
   const user = authService.getCurrentUser();
+  const {
+    theme,
+    resolvedTheme
+  } = useTheme();
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState((user == null ? void 0 : user.emailVerified) || false);
   const handleVerifyEmail = async () => {
@@ -6351,6 +6366,7 @@ function Settings() {
     navigate("/login");
     return null;
   }
+  const activeThemeLabel = theme === "system" ? `Following system preference${resolvedTheme ? ` (${resolvedTheme})` : ""}` : resolvedTheme === "dark" ? "Dark archive mode active" : "Light archive mode active";
   return /* @__PURE__ */ jsxs(Fragment, {
     children: [/* @__PURE__ */ jsx(Navbar, {}), /* @__PURE__ */ jsxs("div", {
       className: "min-h-screen bg-background",
@@ -6509,6 +6525,60 @@ function Settings() {
           className: "rounded-xl border border-border bg-card p-6 space-y-6",
           children: [/* @__PURE__ */ jsxs("div", {
             className: "flex items-center gap-2",
+            children: [/* @__PURE__ */ jsx(Monitor, {
+              className: "h-5 w-5 text-primary"
+            }), /* @__PURE__ */ jsx("h2", {
+              className: "text-xl font-semibold",
+              children: "Appearance"
+            })]
+          }), /* @__PURE__ */ jsxs("div", {
+            className: "flex flex-col gap-5 rounded-2xl border border-border bg-secondary/20 p-5 lg:flex-row lg:items-center lg:justify-between",
+            children: [/* @__PURE__ */ jsxs("div", {
+              className: "space-y-3",
+              children: [/* @__PURE__ */ jsxs("div", {
+                children: [/* @__PURE__ */ jsx("p", {
+                  className: "font-medium",
+                  children: "Theme Preference"
+                }), /* @__PURE__ */ jsx("p", {
+                  className: "text-sm text-muted-foreground",
+                  children: "Choose the archive mood that fits your workspace, or let MovieVault follow your system."
+                })]
+              }), /* @__PURE__ */ jsxs("div", {
+                className: "flex flex-wrap gap-2 text-xs",
+                children: [/* @__PURE__ */ jsxs(Badge, {
+                  variant: "outline",
+                  className: "gap-1.5",
+                  children: [/* @__PURE__ */ jsx(Sun, {
+                    className: "h-3.5 w-3.5"
+                  }), "Light"]
+                }), /* @__PURE__ */ jsxs(Badge, {
+                  variant: "outline",
+                  className: "gap-1.5",
+                  children: [/* @__PURE__ */ jsx(Moon, {
+                    className: "h-3.5 w-3.5"
+                  }), "Dark"]
+                }), /* @__PURE__ */ jsxs(Badge, {
+                  variant: "outline",
+                  className: "gap-1.5",
+                  children: [/* @__PURE__ */ jsx(Monitor, {
+                    className: "h-3.5 w-3.5"
+                  }), "System"]
+                })]
+              })]
+            }), /* @__PURE__ */ jsxs("div", {
+              className: "flex flex-col items-start gap-3 lg:items-end",
+              children: [/* @__PURE__ */ jsx(ThemeModeToggle, {
+                compact: false
+              }), /* @__PURE__ */ jsx("p", {
+                className: "text-xs text-muted-foreground",
+                children: activeThemeLabel
+              })]
+            })]
+          })]
+        }), /* @__PURE__ */ jsxs("section", {
+          className: "rounded-xl border border-border bg-card p-6 space-y-6",
+          children: [/* @__PURE__ */ jsxs("div", {
+            className: "flex items-center gap-2",
             children: [/* @__PURE__ */ jsx(Shield, {
               className: "h-5 w-5 text-primary"
             }), /* @__PURE__ */ jsx("h2", {
@@ -6617,10 +6687,356 @@ function Settings() {
   });
 }
 const Settings_default = UNSAFE_withComponentProps(Settings);
-const route15 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const route13 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   Settings,
   default: Settings_default
+}, Symbol.toStringTag, { value: "Module" }));
+function LandingNavbar() {
+  const location = useLocation();
+  const isAuthenticated = authService.isAuthenticated();
+  const isLoginPage = location.pathname === "/login";
+  const isRegisterPage = location.pathname === "/register";
+  const isResetPage = location.pathname === "/reset-password";
+  return /* @__PURE__ */ jsxs("header", { className: "relative z-50 mx-auto flex max-w-7xl items-center justify-between px-4 py-6 sm:px-6 lg:px-8", children: [
+    /* @__PURE__ */ jsx(Link, { to: "/", className: "group flex items-center transition-opacity hover:opacity-90", children: /* @__PURE__ */ jsx(
+      BrandLogo,
+      {
+        className: "h-[43px] w-auto object-contain sm:h-[50px]"
+      }
+    ) }),
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
+      /* @__PURE__ */ jsx(
+        Link,
+        {
+          to: "/ai-content",
+          className: "mr-2 hidden text-sm font-medium text-foreground transition-colors hover:text-primary md:inline-flex",
+          children: "Reviews"
+        }
+      ),
+      isAuthenticated ? /* @__PURE__ */ jsx(Button, { asChild: true, className: "rounded-full px-6 shadow-lg shadow-primary/20", children: /* @__PURE__ */ jsx(Link, { to: "/home", children: "Open Dashboard" }) }) : /* @__PURE__ */ jsxs(Fragment, { children: [
+        !isLoginPage && !isResetPage && /* @__PURE__ */ jsx(Button, { asChild: true, variant: "ghost", className: "hidden sm:inline-flex", children: /* @__PURE__ */ jsx(Link, { to: "/login", children: "Sign in" }) }),
+        (isLoginPage || isRegisterPage || isResetPage) && /* @__PURE__ */ jsx(Button, { asChild: true, variant: "ghost", className: "hidden sm:inline-flex", children: /* @__PURE__ */ jsx(Link, { to: "/", children: "Home" }) }),
+        !isRegisterPage ? /* @__PURE__ */ jsx(Button, { asChild: true, className: "rounded-full px-6 shadow-lg shadow-primary/20", children: /* @__PURE__ */ jsx(Link, { to: "/register", children: "Create account" }) }) : /* @__PURE__ */ jsx(Button, { asChild: true, className: "rounded-full px-6 shadow-lg shadow-primary/20", children: /* @__PURE__ */ jsx(Link, { to: "/login", children: "Sign in" }) })
+      ] })
+    ] })
+  ] });
+}
+function AIContent() {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    void loadArticles();
+  }, []);
+  const loadArticles = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const articleData = await iaService.getAllArticles();
+      setArticles(articleData);
+    } catch (loadError) {
+      console.error("Failed to load articles:", loadError);
+      setError("Unable to load AI articles right now.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const getModelColor = (model) => {
+    switch (model) {
+      case "Gemini 2.5 Flash":
+        return "border-accent/40 bg-accent/16 text-primary dark:text-accent";
+      default:
+        return "bg-primary/10 text-primary border-primary/20";
+    }
+  };
+  const isAuthenticated = authService.isAuthenticated();
+  return /* @__PURE__ */ jsxs(Fragment, {
+    children: [isAuthenticated ? /* @__PURE__ */ jsx(Navbar, {}) : /* @__PURE__ */ jsx(LandingNavbar, {}), /* @__PURE__ */ jsxs("div", {
+      className: "min-h-screen bg-background",
+      children: [/* @__PURE__ */ jsx("div", {
+        className: "border-b border-border bg-[linear-gradient(135deg,rgba(191,163,122,0.28),rgba(246,239,228,0.96)_42%,rgba(239,230,216,1))] dark:bg-[linear-gradient(135deg,rgba(191,163,122,0.14),rgba(38,38,38,0.98)_42%,rgba(20,20,20,1))]",
+        children: /* @__PURE__ */ jsxs("div", {
+          className: "mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8",
+          children: [/* @__PURE__ */ jsxs("div", {
+            className: "mb-4 flex items-center gap-4",
+            children: [/* @__PURE__ */ jsx("div", {
+              className: "flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10",
+              children: /* @__PURE__ */ jsx(Brain, {
+                className: "h-8 w-8 text-primary"
+              })
+            }), /* @__PURE__ */ jsxs("div", {
+              children: [/* @__PURE__ */ jsx("h1", {
+                className: "text-3xl font-bold",
+                children: "Cinema Reviews"
+              }), /* @__PURE__ */ jsx("p", {
+                className: "mt-1 text-muted-foreground",
+                children: "Expert editorials and movie reviews powered by MovieVault"
+              })]
+            })]
+          }), /* @__PURE__ */ jsx("div", {
+            className: "max-w-3xl rounded-xl border border-primary/30 bg-primary/5 p-4",
+            children: /* @__PURE__ */ jsxs("div", {
+              className: "flex items-start gap-3",
+              children: [/* @__PURE__ */ jsx(Sparkles, {
+                className: "mt-0.5 h-5 w-5 flex-shrink-0 text-primary"
+              }), /* @__PURE__ */ jsx("div", {
+                className: "text-sm text-foreground",
+                children: "A curated space for reviews, editorials, and long-form writing inspired by the catalog."
+              })]
+            })
+          })]
+        })
+      }), /* @__PURE__ */ jsx("div", {
+        className: "mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8",
+        children: loading ? /* @__PURE__ */ jsx("div", {
+          className: "flex items-center justify-center py-20",
+          children: /* @__PURE__ */ jsx(Loader2, {
+            className: "h-8 w-8 animate-spin text-primary"
+          })
+        }) : error ? /* @__PURE__ */ jsxs("div", {
+          className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center",
+          children: [/* @__PURE__ */ jsx("h3", {
+            className: "text-xl font-semibold",
+            children: "Could not load AI content"
+          }), /* @__PURE__ */ jsx("p", {
+            className: "mt-2 text-muted-foreground",
+            children: error
+          }), /* @__PURE__ */ jsx(Button, {
+            variant: "outline",
+            className: "mt-4",
+            onClick: () => void loadArticles(),
+            children: "Retry"
+          })]
+        }) : articles.length > 0 ? /* @__PURE__ */ jsx("div", {
+          className: "space-y-6",
+          children: articles.map((article) => /* @__PURE__ */ jsx("article", {
+            className: "overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10",
+            children: /* @__PURE__ */ jsxs("div", {
+              className: "flex flex-col gap-6 p-6 sm:flex-row",
+              children: [article.imageUrl ? /* @__PURE__ */ jsx("div", {
+                className: "flex-shrink-0",
+                children: /* @__PURE__ */ jsx(ImageWithFallback, {
+                  src: article.imageUrl,
+                  alt: article.title,
+                  className: "h-auto w-full rounded-lg object-cover sm:w-40"
+                })
+              }) : null, /* @__PURE__ */ jsxs("div", {
+                className: "min-w-0 flex-1 space-y-4",
+                children: [/* @__PURE__ */ jsxs("div", {
+                  className: "space-y-2",
+                  children: [/* @__PURE__ */ jsxs("div", {
+                    className: "flex flex-wrap items-center gap-2",
+                    children: [/* @__PURE__ */ jsx(Badge, {
+                      variant: "outline",
+                      className: getModelColor(article.model),
+                      children: article.model
+                    }), /* @__PURE__ */ jsx("span", {
+                      className: "text-xs text-muted-foreground",
+                      children: new Date(article.generatedAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                      })
+                    }), /* @__PURE__ */ jsx("span", {
+                      className: "text-xs text-muted-foreground",
+                      children: "•"
+                    }), /* @__PURE__ */ jsxs("span", {
+                      className: "text-xs text-muted-foreground",
+                      children: [article.readTime, " min read"]
+                    })]
+                  }), /* @__PURE__ */ jsx(Link, {
+                    to: `/ai-content/${article.slug}`,
+                    className: "block",
+                    children: /* @__PURE__ */ jsx("h2", {
+                      className: "text-2xl font-bold transition-colors hover:text-primary",
+                      children: article.title
+                    })
+                  })]
+                }), /* @__PURE__ */ jsx("p", {
+                  className: "line-clamp-3 leading-relaxed text-muted-foreground",
+                  children: article.excerpt
+                }), /* @__PURE__ */ jsx("div", {
+                  className: "flex flex-wrap gap-2",
+                  children: article.tags.map((tag) => /* @__PURE__ */ jsx(Badge, {
+                    variant: "secondary",
+                    className: "text-xs",
+                    children: tag
+                  }, tag))
+                }), /* @__PURE__ */ jsxs("div", {
+                  className: "flex flex-wrap gap-3",
+                  children: [/* @__PURE__ */ jsx(Button, {
+                    asChild: true,
+                    children: /* @__PURE__ */ jsx(Link, {
+                      to: `/ai-content/${article.slug}`,
+                      children: "Read article"
+                    })
+                  }), article.productUrl ? /* @__PURE__ */ jsx(Button, {
+                    asChild: true,
+                    variant: "outline",
+                    children: /* @__PURE__ */ jsxs("a", {
+                      href: article.productUrl,
+                      target: "_blank",
+                      rel: "noreferrer",
+                      children: ["Open shop", /* @__PURE__ */ jsx(ExternalLink, {
+                        className: "h-4 w-4"
+                      })]
+                    })
+                  }) : null]
+                })]
+              })]
+            })
+          }, article.id))
+        }) : /* @__PURE__ */ jsxs("div", {
+          className: "flex flex-col items-center justify-center py-20 text-center",
+          children: [/* @__PURE__ */ jsx(Brain, {
+            className: "mb-4 h-16 w-16 text-muted-foreground"
+          }), /* @__PURE__ */ jsx("h3", {
+            className: "mb-2 text-xl font-semibold",
+            children: "No articles available"
+          })]
+        })
+      })]
+    })]
+  });
+}
+const AIContent_default = UNSAFE_withComponentProps(AIContent);
+const route14 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  AIContent,
+  default: AIContent_default
+}, Symbol.toStringTag, { value: "Module" }));
+function AIArticleDetail() {
+  const {
+    slug
+  } = useParams();
+  const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    if (!slug) {
+      setLoading(false);
+      setError("Article not found.");
+      return;
+    }
+    void loadArticle(slug);
+  }, [slug]);
+  const loadArticle = async (articleSlug) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const articleData = await iaService.getArticleBySlug(articleSlug);
+      if (!articleData) {
+        setError("Article not found.");
+      } else {
+        setArticle(articleData);
+      }
+    } catch (loadError) {
+      console.error("Failed to load article:", loadError);
+      setError("Unable to load this AI article right now.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const isAuthenticated = authService.isAuthenticated();
+  return /* @__PURE__ */ jsxs(Fragment, {
+    children: [isAuthenticated ? /* @__PURE__ */ jsx(Navbar, {}) : /* @__PURE__ */ jsx(LandingNavbar, {}), /* @__PURE__ */ jsx("div", {
+      className: "min-h-screen bg-background",
+      children: /* @__PURE__ */ jsx("div", {
+        className: "border-b border-border bg-[linear-gradient(135deg,rgba(191,163,122,0.28),rgba(246,239,228,0.96)_42%,rgba(239,230,216,1))] dark:bg-[linear-gradient(135deg,rgba(191,163,122,0.14),rgba(38,38,38,0.98)_42%,rgba(20,20,20,1))]",
+        children: /* @__PURE__ */ jsxs("div", {
+          className: "mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8",
+          children: [/* @__PURE__ */ jsx(Button, {
+            asChild: true,
+            variant: "ghost",
+            className: "mb-4 -ml-4",
+            children: /* @__PURE__ */ jsxs(Link, {
+              to: "/ai-content",
+              children: [/* @__PURE__ */ jsx(ArrowLeft, {
+                className: "h-4 w-4"
+              }), "Back to AI content"]
+            })
+          }), loading ? /* @__PURE__ */ jsx("div", {
+            className: "flex items-center justify-center py-16",
+            children: /* @__PURE__ */ jsx(Loader2, {
+              className: "h-8 w-8 animate-spin text-primary"
+            })
+          }) : error || !article ? /* @__PURE__ */ jsxs("div", {
+            className: "rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center",
+            children: [/* @__PURE__ */ jsx("h2", {
+              className: "text-2xl font-bold",
+              children: "Article unavailable"
+            }), /* @__PURE__ */ jsx("p", {
+              className: "mt-2 text-muted-foreground",
+              children: error ?? "This article could not be found."
+            })]
+          }) : /* @__PURE__ */ jsxs("div", {
+            className: "space-y-6",
+            children: [/* @__PURE__ */ jsxs("div", {
+              className: "flex flex-wrap items-center gap-2",
+              children: [/* @__PURE__ */ jsx(Badge, {
+                variant: "outline",
+                className: "border-accent/40 bg-accent/16 text-primary dark:text-accent",
+                children: article.model
+              }), /* @__PURE__ */ jsxs(Badge, {
+                variant: "secondary",
+                children: [article.readTime, " min read"]
+              }), /* @__PURE__ */ jsx("span", {
+                className: "text-sm text-muted-foreground",
+                children: new Date(article.generatedAt).toLocaleDateString()
+              })]
+            }), /* @__PURE__ */ jsxs("div", {
+              className: "space-y-3",
+              children: [/* @__PURE__ */ jsx("h1", {
+                className: "text-4xl font-bold font-serif leading-tight",
+                children: article.title
+              }), /* @__PURE__ */ jsx("p", {
+                className: "max-w-3xl text-sm uppercase tracking-widest text-primary font-medium",
+                children: "MovieVault Editorial Review"
+              })]
+            }), article.imageUrl ? /* @__PURE__ */ jsx("div", {
+              className: "overflow-hidden rounded-2xl border border-border",
+              children: /* @__PURE__ */ jsx(ImageWithFallback, {
+                src: article.imageUrl,
+                alt: article.title,
+                className: "h-[320px] w-full object-cover"
+              })
+            }) : null, /* @__PURE__ */ jsx(AIArticleBlock, {
+              article
+            }), /* @__PURE__ */ jsxs("div", {
+              className: "flex flex-wrap gap-3",
+              children: [article.productUrl ? /* @__PURE__ */ jsx(Button, {
+                asChild: true,
+                children: /* @__PURE__ */ jsxs("a", {
+                  href: article.productUrl,
+                  target: "_blank",
+                  rel: "noreferrer",
+                  children: ["Open edition in shop", /* @__PURE__ */ jsx(ExternalLink, {
+                    className: "h-4 w-4"
+                  })]
+                })
+              }) : null, /* @__PURE__ */ jsx(Button, {
+                asChild: true,
+                variant: "outline",
+                children: /* @__PURE__ */ jsxs(Link, {
+                  to: "/ai-content",
+                  children: [/* @__PURE__ */ jsx(Sparkles, {
+                    className: "h-4 w-4"
+                  }), "More AI articles"]
+                })
+              })]
+            })]
+          })]
+        })
+      })
+    })]
+  });
+}
+const AIArticleDetail_default = UNSAFE_withComponentProps(AIArticleDetail);
+const route15 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  AIArticleDetail,
+  default: AIArticleDetail_default
 }, Symbol.toStringTag, { value: "Module" }));
 const NotFound = UNSAFE_withComponentProps(function NotFound2() {
   return /* @__PURE__ */ jsx("div", {
@@ -6645,7 +7061,7 @@ const route16 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePrope
   __proto__: null,
   default: NotFound
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-rA_F2ttg.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/index-Bzv9XdRk.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/root-D6DYg1kQ.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/index-Bzv9XdRk.js"], "css": ["/assets/root-BTLglgmt.css"], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Landing": { "id": "app/pages/Landing", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Landing-CwUHUp08.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/carousel-C0MlUYWT.js", "/assets/auth.service-CBrV3YtK.js", "/assets/button-ESa0N7c0.js", "/assets/badge-B5g8Ss1_.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/utils-CEYfcJUd.js", "/assets/sparkles-CH2qONMG.js", "/assets/trending-up-iO4vtaNH.js", "/assets/star-CI7aJQYv.js", "/assets/arrow-left-CguzLQK3.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Login": { "id": "app/pages/Login", "parentId": "root", "path": "login", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Login-D1RUD7_D.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/auth.service-CBrV3YtK.js", "/assets/button-ESa0N7c0.js", "/assets/input-C4eaHh5l.js", "/assets/label-DCkJNjVM.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Register": { "id": "app/pages/Register", "parentId": "root", "path": "register", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Register-DtCzmH-t.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/auth.service-CBrV3YtK.js", "/assets/button-ESa0N7c0.js", "/assets/input-C4eaHh5l.js", "/assets/label-DCkJNjVM.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/ResetPassword": { "id": "app/pages/ResetPassword", "parentId": "root", "path": "reset-password", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/ResetPassword-BbnCHlxa.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/auth.service-CBrV3YtK.js", "/assets/button-ESa0N7c0.js", "/assets/input-C4eaHh5l.js", "/assets/label-DCkJNjVM.js", "/assets/utils-CEYfcJUd.js", "/assets/circle-check-DEgUszJd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/components/ProtectedRouteLayout": { "id": "app/components/ProtectedRouteLayout", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/ProtectedRouteLayout-B2kx6352.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/auth.service-CBrV3YtK.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Home": { "id": "app/pages/Home", "parentId": "app/components/ProtectedRouteLayout", "path": "home", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Home-CwxMs290.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/auth.service-CBrV3YtK.js", "/assets/ranking.service-0e-SDHzC.js", "/assets/ia.service-MIWK3q4G.js", "/assets/carousel-C0MlUYWT.js", "/assets/Navbar-DLIfqzBH.js", "/assets/AIArticleBlock-jkfjhxKq.js", "/assets/button-ESa0N7c0.js", "/assets/badge-B5g8Ss1_.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/sparkles-CH2qONMG.js", "/assets/trending-up-iO4vtaNH.js", "/assets/utils-CEYfcJUd.js", "/assets/brain-B9j_wCpl.js", "/assets/star-CI7aJQYv.js", "/assets/arrow-left-CguzLQK3.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Catalog": { "id": "app/pages/Catalog", "parentId": "app/components/ProtectedRouteLayout", "path": "catalog", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Catalog-CYjj1ab5.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/Navbar-DLIfqzBH.js", "/assets/input-C4eaHh5l.js", "/assets/button-ESa0N7c0.js", "/assets/search-t-eoAroi.js", "/assets/x-CifY1JmM.js", "/assets/badge-B5g8Ss1_.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/calendar-NBRkC3VQ.js", "/assets/catalog.service-CieZ9DKe.js", "/assets/auth.service-CBrV3YtK.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/AddRelease": { "id": "app/pages/AddRelease", "parentId": "app/components/ProtectedRouteLayout", "path": "catalog/releases/new", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/AddRelease-CtIyhEis.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/Navbar-DLIfqzBH.js", "/assets/input-C4eaHh5l.js", "/assets/button-ESa0N7c0.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/catalog.service-CieZ9DKe.js", "/assets/textarea-DbjzM2M-.js", "/assets/auth.service-CBrV3YtK.js", "/assets/search-t-eoAroi.js", "/assets/circle-check-DEgUszJd.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/ReleaseDetail": { "id": "app/pages/ReleaseDetail", "parentId": "app/components/ProtectedRouteLayout", "path": "releases/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/ReleaseDetail-HdvnI1Ur.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/Navbar-DLIfqzBH.js", "/assets/button-ESa0N7c0.js", "/assets/badge-B5g8Ss1_.js", "/assets/separator-BoatyP75.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/catalog.service-CieZ9DKe.js", "/assets/CollectionItemDialog-DbYA4WO5.js", "/assets/auth.service-CBrV3YtK.js", "/assets/arrow-left-CguzLQK3.js", "/assets/x-CifY1JmM.js", "/assets/textarea-DbjzM2M-.js", "/assets/calendar-NBRkC3VQ.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js", "/assets/input-C4eaHh5l.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/MovieDetail": { "id": "app/pages/MovieDetail", "parentId": "app/components/ProtectedRouteLayout", "path": "movie/:id", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/MovieDetail-B2Viwt_-.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/ia.service-MIWK3q4G.js", "/assets/Navbar-DLIfqzBH.js", "/assets/AIArticleBlock-jkfjhxKq.js", "/assets/button-ESa0N7c0.js", "/assets/badge-B5g8Ss1_.js", "/assets/separator-BoatyP75.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/auth.service-CBrV3YtK.js", "/assets/calendar-NBRkC3VQ.js", "/assets/star-CI7aJQYv.js", "/assets/user-RwXd0A7H.js", "/assets/sparkles-CH2qONMG.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Collection": { "id": "app/pages/Collection", "parentId": "app/components/ProtectedRouteLayout", "path": "collection", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Collection-IwCc6ogi.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/CollectionItemDialog-DbYA4WO5.js", "/assets/auth.service-CBrV3YtK.js", "/assets/Navbar-DLIfqzBH.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/badge-B5g8Ss1_.js", "/assets/button-ESa0N7c0.js", "/assets/x-CifY1JmM.js", "/assets/index-BC5t378G.js", "/assets/utils-CEYfcJUd.js", "/assets/catalog.service-CieZ9DKe.js", "/assets/input-C4eaHh5l.js", "/assets/textarea-DbjzM2M-.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/AIContent": { "id": "app/pages/AIContent", "parentId": "app/components/ProtectedRouteLayout", "path": "ai-content", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/AIContent-zVm6Ltk_.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/ia.service-MIWK3q4G.js", "/assets/Navbar-DLIfqzBH.js", "/assets/badge-B5g8Ss1_.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/button-ESa0N7c0.js", "/assets/brain-B9j_wCpl.js", "/assets/sparkles-CH2qONMG.js", "/assets/auth.service-CBrV3YtK.js", "/assets/external-link-DpDaukak.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/AIArticleDetail": { "id": "app/pages/AIArticleDetail", "parentId": "app/components/ProtectedRouteLayout", "path": "ai-content/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/AIArticleDetail-BCfyXWkA.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/Navbar-DLIfqzBH.js", "/assets/button-ESa0N7c0.js", "/assets/badge-B5g8Ss1_.js", "/assets/ImageWithFallback-BTBg3PWe.js", "/assets/AIArticleBlock-jkfjhxKq.js", "/assets/ia.service-MIWK3q4G.js", "/assets/arrow-left-CguzLQK3.js", "/assets/auth.service-CBrV3YtK.js", "/assets/external-link-DpDaukak.js", "/assets/sparkles-CH2qONMG.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Ranking": { "id": "app/pages/Ranking", "parentId": "app/components/ProtectedRouteLayout", "path": "ranking", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Ranking-O5Wvbiib.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/ranking.service-0e-SDHzC.js", "/assets/auth.service-CBrV3YtK.js", "/assets/Navbar-DLIfqzBH.js", "/assets/trending-up-iO4vtaNH.js", "/assets/badge-B5g8Ss1_.js", "/assets/index-BC5t378G.js", "/assets/utils-CEYfcJUd.js", "/assets/separator-BoatyP75.js", "/assets/star-CI7aJQYv.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Settings": { "id": "app/pages/Settings", "parentId": "app/components/ProtectedRouteLayout", "path": "settings", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Settings-CN62E1Eg.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js", "/assets/auth.service-CBrV3YtK.js", "/assets/Navbar-DLIfqzBH.js", "/assets/button-ESa0N7c0.js", "/assets/input-C4eaHh5l.js", "/assets/label-DCkJNjVM.js", "/assets/separator-BoatyP75.js", "/assets/badge-B5g8Ss1_.js", "/assets/user-RwXd0A7H.js", "/assets/circle-check-DEgUszJd.js", "/assets/utils-CEYfcJUd.js", "/assets/index-BC5t378G.js", "/assets/index-Bzv9XdRk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/NotFound": { "id": "app/pages/NotFound", "parentId": "root", "path": "*", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/NotFound-CZl5r0Rb.js", "imports": ["/assets/chunk-QFMPRPBF-BfFoP_Qc.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 } }, "url": "/assets/manifest-4eb5dd65.js", "version": "4eb5dd65", "sri": void 0 };
+const serverManifest = { "entry": { "module": "/assets/entry.client-B0X3uOEN.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/index-CFR20hZh.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/root-C25B--wH.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/index-CFR20hZh.js", "/assets/index-DrlS4Osi.js", "/assets/auth.service-DrUpEswG.js", "/assets/BrandLogo-NjgWP-Dk.js"], "css": ["/assets/root-YNP7Jw8b.css"], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Landing": { "id": "app/pages/Landing", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Landing-BCQPalI-.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/auth.service-DrUpEswG.js", "/assets/input-76JKSIPZ.js", "/assets/Navbar-CyKEb4P9.js", "/assets/badge-DRDwSjYX.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/arrow-right-oAgeuAb5.js", "/assets/star-BEthlOnw.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/index-CFR20hZh.js", "/assets/index-DrlS4Osi.js", "/assets/createLucideIcon-CSKV2bCL.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Login": { "id": "app/pages/Login", "parentId": "root", "path": "login", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Login-Bw9ajWN7.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/auth.service-DrUpEswG.js", "/assets/input-76JKSIPZ.js", "/assets/label-CPEIaZ-W.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/loader-circle-BKeytDa8.js", "/assets/index-CFR20hZh.js", "/assets/createLucideIcon-CSKV2bCL.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Register": { "id": "app/pages/Register", "parentId": "root", "path": "register", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Register-DcAmH-6q.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/auth.service-DrUpEswG.js", "/assets/input-76JKSIPZ.js", "/assets/label-CPEIaZ-W.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/loader-circle-BKeytDa8.js", "/assets/index-CFR20hZh.js", "/assets/createLucideIcon-CSKV2bCL.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/ResetPassword": { "id": "app/pages/ResetPassword", "parentId": "root", "path": "reset-password", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/ResetPassword-DWkp365I.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/auth.service-DrUpEswG.js", "/assets/input-76JKSIPZ.js", "/assets/label-CPEIaZ-W.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/circle-check-DAMz4umd.js", "/assets/loader-circle-BKeytDa8.js", "/assets/index-CFR20hZh.js", "/assets/createLucideIcon-CSKV2bCL.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/components/ProtectedRouteLayout": { "id": "app/components/ProtectedRouteLayout", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/ProtectedRouteLayout-o3ng9svl.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/auth.service-DrUpEswG.js", "/assets/loader-circle-BKeytDa8.js", "/assets/createLucideIcon-CSKV2bCL.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Home": { "id": "app/pages/Home", "parentId": "app/components/ProtectedRouteLayout", "path": "home", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Home-BAjECNJO.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/auth.service-DrUpEswG.js", "/assets/ranking.service-Do73GabB.js", "/assets/ia.service-DBzcIhxH.js", "/assets/Navbar-CyKEb4P9.js", "/assets/AIArticleBlock-PYiYYBJC.js", "/assets/input-76JKSIPZ.js", "/assets/badge-DRDwSjYX.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/arrow-left-Dd831n7h.js", "/assets/arrow-right-oAgeuAb5.js", "/assets/loader-circle-BKeytDa8.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/star-BEthlOnw.js", "/assets/index-CFR20hZh.js", "/assets/index-DrlS4Osi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Catalog": { "id": "app/pages/Catalog", "parentId": "app/components/ProtectedRouteLayout", "path": "catalog", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Catalog-DSjmDC1V.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/Navbar-CyKEb4P9.js", "/assets/input-76JKSIPZ.js", "/assets/x-CF-dQGwd.js", "/assets/badge-DRDwSjYX.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/calendar-BNzOvajC.js", "/assets/catalog.service-N7Q8aKaP.js", "/assets/loader-circle-BKeytDa8.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/auth.service-DrUpEswG.js", "/assets/index-CFR20hZh.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/index-DrlS4Osi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/AddRelease": { "id": "app/pages/AddRelease", "parentId": "app/components/ProtectedRouteLayout", "path": "catalog/releases/new", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/AddRelease-CZEI8ww_.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/Navbar-CyKEb4P9.js", "/assets/input-76JKSIPZ.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/catalog.service-N7Q8aKaP.js", "/assets/textarea-nMwVbmfK.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/loader-circle-BKeytDa8.js", "/assets/circle-check-DAMz4umd.js", "/assets/auth.service-DrUpEswG.js", "/assets/index-CFR20hZh.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/index-DrlS4Osi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/ReleaseDetail": { "id": "app/pages/ReleaseDetail", "parentId": "app/components/ProtectedRouteLayout", "path": "releases/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/ReleaseDetail-auX2r7ww.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/Navbar-CyKEb4P9.js", "/assets/input-76JKSIPZ.js", "/assets/badge-DRDwSjYX.js", "/assets/separator-DSuwcCmm.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/catalog.service-N7Q8aKaP.js", "/assets/film.service-Xy-clkTY.js", "/assets/CollectionItemDialog-Dqu5MfTP.js", "/assets/loader-circle-BKeytDa8.js", "/assets/arrow-left-Dd831n7h.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/x-CF-dQGwd.js", "/assets/star-BEthlOnw.js", "/assets/calendar-BNzOvajC.js", "/assets/auth.service-DrUpEswG.js", "/assets/index-CFR20hZh.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/index-DrlS4Osi.js", "/assets/textarea-nMwVbmfK.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/MovieDetail": { "id": "app/pages/MovieDetail", "parentId": "app/components/ProtectedRouteLayout", "path": "movie/:id", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/MovieDetail-BAiJDXde.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/film.service-Xy-clkTY.js", "/assets/ia.service-DBzcIhxH.js", "/assets/Navbar-CyKEb4P9.js", "/assets/AIArticleBlock-PYiYYBJC.js", "/assets/input-76JKSIPZ.js", "/assets/badge-DRDwSjYX.js", "/assets/separator-DSuwcCmm.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/loader-circle-BKeytDa8.js", "/assets/calendar-BNzOvajC.js", "/assets/star-BEthlOnw.js", "/assets/user-DPV8MmfC.js", "/assets/auth.service-DrUpEswG.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/index-CFR20hZh.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/index-DrlS4Osi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Collection": { "id": "app/pages/Collection", "parentId": "app/components/ProtectedRouteLayout", "path": "collection", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Collection-1sEnRn3N.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/CollectionItemDialog-Dqu5MfTP.js", "/assets/auth.service-DrUpEswG.js", "/assets/Navbar-CyKEb4P9.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/badge-DRDwSjYX.js", "/assets/input-76JKSIPZ.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/x-CF-dQGwd.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/loader-circle-BKeytDa8.js", "/assets/catalog.service-N7Q8aKaP.js", "/assets/textarea-nMwVbmfK.js", "/assets/index-CFR20hZh.js", "/assets/index-DrlS4Osi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Ranking": { "id": "app/pages/Ranking", "parentId": "app/components/ProtectedRouteLayout", "path": "ranking", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Ranking-DZUDu2L5.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/ranking.service-Do73GabB.js", "/assets/auth.service-DrUpEswG.js", "/assets/Navbar-CyKEb4P9.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/badge-DRDwSjYX.js", "/assets/input-76JKSIPZ.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/separator-DSuwcCmm.js", "/assets/loader-circle-BKeytDa8.js", "/assets/star-BEthlOnw.js", "/assets/index-CFR20hZh.js", "/assets/index-DrlS4Osi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/Settings": { "id": "app/pages/Settings", "parentId": "app/components/ProtectedRouteLayout", "path": "settings", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/Settings-BlhXko03.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/index-DrlS4Osi.js", "/assets/auth.service-DrUpEswG.js", "/assets/Navbar-CyKEb4P9.js", "/assets/input-76JKSIPZ.js", "/assets/label-CPEIaZ-W.js", "/assets/separator-DSuwcCmm.js", "/assets/badge-DRDwSjYX.js", "/assets/user-DPV8MmfC.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/circle-check-DAMz4umd.js", "/assets/loader-circle-BKeytDa8.js", "/assets/index-CFR20hZh.js", "/assets/BrandLogo-NjgWP-Dk.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/AIContent": { "id": "app/pages/AIContent", "parentId": "root", "path": "ai-content", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/AIContent-BO2icRaA.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/ia.service-DBzcIhxH.js", "/assets/Navbar-CyKEb4P9.js", "/assets/badge-DRDwSjYX.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/input-76JKSIPZ.js", "/assets/LandingNavbar-p2dHn6TM.js", "/assets/auth.service-DrUpEswG.js", "/assets/loader-circle-BKeytDa8.js", "/assets/createLucideIcon-CSKV2bCL.js", "/assets/index-CFR20hZh.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/index-DrlS4Osi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/AIArticleDetail": { "id": "app/pages/AIArticleDetail", "parentId": "root", "path": "ai-content/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/AIArticleDetail-BqVgpMC1.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js", "/assets/Navbar-CyKEb4P9.js", "/assets/LandingNavbar-p2dHn6TM.js", "/assets/auth.service-DrUpEswG.js", "/assets/input-76JKSIPZ.js", "/assets/badge-DRDwSjYX.js", "/assets/ImageWithFallback-BAnfm5Vs.js", "/assets/AIArticleBlock-PYiYYBJC.js", "/assets/ia.service-DBzcIhxH.js", "/assets/arrow-left-Dd831n7h.js", "/assets/loader-circle-BKeytDa8.js", "/assets/index-CFR20hZh.js", "/assets/BrandLogo-NjgWP-Dk.js", "/assets/index-DrlS4Osi.js", "/assets/createLucideIcon-CSKV2bCL.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 }, "app/pages/NotFound": { "id": "app/pages/NotFound", "parentId": "root", "path": "*", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasClientMiddleware": false, "hasDefaultExport": true, "hasErrorBoundary": false, "module": "/assets/NotFound-BBUd4xh1.js", "imports": ["/assets/chunk-QFMPRPBF-DricjL1x.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "clientMiddlewareModule": void 0, "hydrateFallbackModule": void 0 } }, "url": "/assets/manifest-9ed60392.js", "version": "9ed60392", "sri": void 0 };
 const assetsBuildDirectory = "build\\client";
 const basename = "/";
 const future = { "unstable_optimizeDeps": false, "unstable_passThroughRequests": false, "unstable_subResourceIntegrity": false, "unstable_trailingSlashAwareDataRequests": false, "unstable_previewServerPrerendering": false, "v8_middleware": false, "v8_splitRouteModules": false, "v8_viteEnvironmentApi": false };
@@ -6752,34 +7168,34 @@ const routes = {
     caseSensitive: void 0,
     module: route11
   },
-  "app/pages/AIContent": {
-    id: "app/pages/AIContent",
-    parentId: "app/components/ProtectedRouteLayout",
-    path: "ai-content",
-    index: void 0,
-    caseSensitive: void 0,
-    module: route12
-  },
-  "app/pages/AIArticleDetail": {
-    id: "app/pages/AIArticleDetail",
-    parentId: "app/components/ProtectedRouteLayout",
-    path: "ai-content/:slug",
-    index: void 0,
-    caseSensitive: void 0,
-    module: route13
-  },
   "app/pages/Ranking": {
     id: "app/pages/Ranking",
     parentId: "app/components/ProtectedRouteLayout",
     path: "ranking",
     index: void 0,
     caseSensitive: void 0,
-    module: route14
+    module: route12
   },
   "app/pages/Settings": {
     id: "app/pages/Settings",
     parentId: "app/components/ProtectedRouteLayout",
     path: "settings",
+    index: void 0,
+    caseSensitive: void 0,
+    module: route13
+  },
+  "app/pages/AIContent": {
+    id: "app/pages/AIContent",
+    parentId: "root",
+    path: "ai-content",
+    index: void 0,
+    caseSensitive: void 0,
+    module: route14
+  },
+  "app/pages/AIArticleDetail": {
+    id: "app/pages/AIArticleDetail",
+    parentId: "root",
+    path: "ai-content/:slug",
     index: void 0,
     caseSensitive: void 0,
     module: route15

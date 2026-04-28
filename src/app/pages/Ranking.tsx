@@ -42,7 +42,7 @@ export function Ranking() {
       <Navbar />
       <div className="min-h-screen bg-background">
         {/* Header */}
-        <div className="border-b border-border bg-[linear-gradient(135deg,rgba(200,181,154,0.28),rgba(251,248,242,0.96)_46%,rgba(242,238,231,1))] dark:bg-[linear-gradient(135deg,rgba(200,181,154,0.14),rgba(23,27,34,0.98)_46%,rgba(14,17,22,1))]">
+        <div className="border-b border-border bg-[linear-gradient(135deg,rgba(191,163,122,0.28),rgba(246,239,228,0.96)_46%,rgba(239,230,216,1))] dark:bg-[linear-gradient(135deg,rgba(191,163,122,0.14),rgba(38,38,38,0.98)_46%,rgba(20,20,20,1))]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20">

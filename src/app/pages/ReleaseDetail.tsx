@@ -236,7 +236,7 @@ export function ReleaseDetail() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(200,181,154,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(107,111,122,0.12),transparent_18%),linear-gradient(180deg,rgba(255,251,244,0.98),rgba(242,238,231,1))] text-foreground dark:bg-[radial-gradient(circle_at_top,rgba(200,181,154,0.1),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(107,111,122,0.12),transparent_18%),linear-gradient(180deg,rgba(23,27,34,0.98),rgba(14,17,22,1))]">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(191,163,122,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(138,129,120,0.12),transparent_18%),linear-gradient(180deg,rgba(251,245,236,0.98),rgba(239,230,216,1))] text-foreground dark:bg-[radial-gradient(circle_at_top,rgba(191,163,122,0.1),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(138,129,120,0.12),transparent_18%),linear-gradient(180deg,rgba(38,38,38,0.98),rgba(20,20,20,1))]">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <Button asChild variant="outline" className="border-border bg-card/80 text-foreground hover:bg-secondary">
@@ -254,8 +254,8 @@ export function ReleaseDetail() {
             </div>
           </div>
 
-          <section className="overflow-hidden rounded-[2rem] border border-border/80 bg-card/86 shadow-[0_32px_100px_rgba(44,47,58,0.12)] backdrop-blur dark:shadow-[0_32px_120px_rgba(0,0,0,0.36)]">
-            <div className="border-b border-border/80 bg-[radial-gradient(circle_at_top_left,rgba(200,181,154,0.22),transparent_38%),linear-gradient(180deg,rgba(251,248,242,0.96),rgba(242,238,231,0.94))] p-6 sm:p-8 lg:p-10 dark:bg-[radial-gradient(circle_at_top_left,rgba(200,181,154,0.12),transparent_34%),linear-gradient(180deg,rgba(23,27,34,0.96),rgba(18,22,29,0.94))]">
+          <section className="overflow-hidden rounded-[2rem] border border-border/80 bg-card/86 shadow-[0_32px_100px_rgba(20,20,20,0.12)] backdrop-blur dark:shadow-[0_32px_120px_rgba(0,0,0,0.36)]">
+            <div className="border-b border-border/80 bg-[radial-gradient(circle_at_top_left,rgba(191,163,122,0.22),transparent_38%),linear-gradient(180deg,rgba(246,239,228,0.96),rgba(239,230,216,0.94))] p-6 sm:p-8 lg:p-10 dark:bg-[radial-gradient(circle_at_top_left,rgba(191,163,122,0.12),transparent_34%),linear-gradient(180deg,rgba(38,38,38,0.96),rgba(27,27,27,0.94))]">
               <div className="grid gap-8">
                 <div className="space-y-5">
                   <div className="flex flex-wrap items-center gap-3">
@@ -331,7 +331,7 @@ export function ReleaseDetail() {
             </div>
 
             <div className="grid gap-0 lg:grid-cols-[minmax(320px,420px)_1fr]">
-              <div className="border-b border-border/80 bg-[radial-gradient(circle_at_top,rgba(200,181,154,0.16),transparent_38%),rgba(248,244,236,0.92)] p-6 lg:border-b-0 lg:border-r dark:bg-[radial-gradient(circle_at_top,rgba(200,181,154,0.1),transparent_34%),rgba(18,22,29,0.92)]">
+              <div className="border-b border-border/80 bg-[radial-gradient(circle_at_top,rgba(191,163,122,0.16),transparent_38%),rgba(244,235,223,0.92)] p-6 lg:border-b-0 lg:border-r dark:bg-[radial-gradient(circle_at_top,rgba(191,163,122,0.1),transparent_34%),rgba(27,27,27,0.92)]">
                 <div className="overflow-hidden rounded-[1.5rem] border border-border/80 bg-background/70">
                   <div className="aspect-[3/4]">
                     {activePicture ? (
@@ -366,7 +366,7 @@ export function ReleaseDetail() {
                             onClick={() => setActivePictureId(picture.id)}
                             className={`overflow-hidden rounded-xl border transition ${
                               isActive
-                                ? 'border-accent shadow-[0_0_0_1px_rgba(200,181,154,0.9)]'
+                                ? 'border-accent shadow-[0_0_0_1px_rgba(191,163,122,0.9)]'
                                 : 'border-border hover:border-accent/60'
                             }`}
                           >
