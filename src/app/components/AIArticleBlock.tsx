@@ -13,13 +13,13 @@ export function AIArticleBlock({ article, compact = false, href }: AIArticleBloc
   const getModelColor = () => {
     switch (article.model) {
       case 'Gemini 2.5 Flash':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+        return 'border-accent/40 bg-accent/16 text-primary dark:text-accent';
       case 'Gemini Pro':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+        return 'border-accent/40 bg-accent/16 text-primary dark:text-accent';
       case 'GPT-4':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
+        return 'border-primary/30 bg-primary/10 text-primary dark:text-primary-foreground';
       case 'Claude 3':
-        return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+        return 'border-border bg-secondary/60 text-foreground';
       default:
         return 'bg-primary/10 text-primary border-primary/20';
     }

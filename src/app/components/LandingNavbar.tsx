@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router';
-import { Film } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import { Button } from './ui/button';
+import { BrandLogo } from './BrandLogo';
 
 export function LandingNavbar() {
   const location = useLocation();
@@ -12,14 +12,10 @@ export function LandingNavbar() {
 
   return (
     <header className="relative z-50 mx-auto flex max-w-7xl items-center justify-between px-4 py-6 sm:px-6 lg:px-8">
-      <Link to="/" className="flex items-center gap-3 group transition-opacity hover:opacity-90">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform group-hover:scale-105">
-          <Film className="h-6 w-6" />
-        </div>
-        <div>
-          <p className="text-lg font-semibold leading-none">MovieVault</p>
-          <p className="mt-1 text-xs uppercase tracking-[0.24em] text-muted-foreground">Showcase Edition</p>
-        </div>
+      <Link to="/" className="group flex items-center transition-opacity hover:opacity-90">
+        <BrandLogo
+          className="h-[43px] w-auto object-contain sm:h-[50px]"
+        />
       </Link>
       
       <div className="flex items-center gap-3">

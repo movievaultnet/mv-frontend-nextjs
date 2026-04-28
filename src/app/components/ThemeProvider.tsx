@@ -1,0 +1,22 @@
+'use client';
+
+import type { ReactNode } from 'react';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      storageKey="movievault-theme"
+      defaultTheme="system"
+      themes={['light', 'dark', 'system']}
+      enableSystem
+      enableColorScheme
+      disableTransitionOnChange
+    >
+      {children}
+    </NextThemesProvider>
+  );
+}
+
+export default ThemeProvider;

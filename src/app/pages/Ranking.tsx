@@ -42,11 +42,11 @@ export function Ranking() {
       <Navbar />
       <div className="min-h-screen bg-background">
         {/* Header */}
-        <div className="border-b border-border bg-[linear-gradient(135deg,rgba(140,106,67,0.22),rgba(9,9,10,0.96)_46%,rgba(9,9,10,1))]">
+        <div className="border-b border-border bg-[linear-gradient(135deg,rgba(200,181,154,0.28),rgba(251,248,242,0.96)_46%,rgba(242,238,231,1))] dark:bg-[linear-gradient(135deg,rgba(200,181,154,0.14),rgba(23,27,34,0.98)_46%,rgba(14,17,22,1))]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8c6a43]/15">
-                <Trophy className="h-8 w-8 text-[#8c6a43]" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/20">
+                <Trophy className="h-8 w-8 text-primary dark:text-accent" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold">Global Leaderboard</h1>

@@ -22,7 +22,7 @@ export function CatalogSearchCard({ item }: CatalogSearchCardProps) {
             alt={item.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 opacity-0 transition-opacity group-hover:opacity-100" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/0 to-background/0 opacity-0 transition-opacity group-hover:opacity-100" />
         </div>
 
         <div className="space-y-3 p-4">

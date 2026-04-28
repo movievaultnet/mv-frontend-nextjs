@@ -112,7 +112,7 @@ export function ReleaseDetail() {
   useEffect(() => {
     if (!slug || !resolvedEditionId) {
       setLoading(false);
-      setError('The edition id could not be resolved from this slug. Open the release from the catalog search results first.');
+      setError('This release could not be opened from the current link. Try returning to the catalog and opening it again.');
       return;
     }
 
@@ -228,13 +228,18 @@ export function ReleaseDetail() {
     );
   }
 
+  const filmTitle = film?.title || 'Film data unavailable';
+  const filmYear = film?.releaseYear ? String(film.releaseYear) : 'Not available';
+  const releaseLabel = buildEditionLabel(release);
+  const releaseSummary = buildEditionSummary(release);
+
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(193,18,31,0.2),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(140,106,67,0.14),transparent_18%),linear-gradient(180deg,rgba(17,17,19,0.98),rgba(5,5,6,1))] text-slate-50">
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(200,181,154,0.24),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(107,111,122,0.12),transparent_18%),linear-gradient(180deg,rgba(255,251,244,0.98),rgba(242,238,231,1))] text-foreground dark:bg-[radial-gradient(circle_at_top,rgba(200,181,154,0.1),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(107,111,122,0.12),transparent_18%),linear-gradient(180deg,rgba(23,27,34,0.98),rgba(14,17,22,1))]">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-            <Button asChild variant="outline" className="border-white/10 bg-black/30 text-slate-100 hover:bg-black/45">
+            <Button asChild variant="outline" className="border-border bg-card/80 text-foreground hover:bg-secondary">
               <Link to="/catalog">
                 <ArrowLeft className="h-4 w-4" />
                 Back to catalog
@@ -242,15 +247,15 @@ export function ReleaseDetail() {
             </Button>
 
             <div className="flex flex-wrap gap-2">
-              <Badge className={release.verified ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-200' : 'border-primary/30 bg-primary/15 text-primary-foreground'}>
+              <Badge className={release.verified ? 'border-emerald-500/30 bg-emerald-500/12 text-emerald-700 dark:text-emerald-200' : 'border-primary/30 bg-primary/15 text-primary dark:text-primary-foreground'}>
                 <ShieldCheck className="mr-1 h-3.5 w-3.5" />
                 {release.verified ? 'Verified release' : 'Pending verification'}
               </Badge>
             </div>
           </div>
 
-          <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-black/45 shadow-[0_30px_120px_rgba(0,0,0,0.45)] backdrop-blur">
-            <div className="border-b border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(193,18,31,0.18),transparent_38%),linear-gradient(180deg,rgba(17,17,19,0.94),rgba(10,10,12,0.94))] p-6 sm:p-8 lg:p-10">
+          <section className="overflow-hidden rounded-[2rem] border border-border/80 bg-card/86 shadow-[0_32px_100px_rgba(44,47,58,0.12)] backdrop-blur dark:shadow-[0_32px_120px_rgba(0,0,0,0.36)]">
+            <div className="border-b border-border/80 bg-[radial-gradient(circle_at_top_left,rgba(200,181,154,0.22),transparent_38%),linear-gradient(180deg,rgba(251,248,242,0.96),rgba(242,238,231,0.94))] p-6 sm:p-8 lg:p-10 dark:bg-[radial-gradient(circle_at_top_left,rgba(200,181,154,0.12),transparent_34%),linear-gradient(180deg,rgba(23,27,34,0.96),rgba(18,22,29,0.94))]">
               <div className="grid gap-8">
                 <div className="space-y-5">
                   <div className="flex flex-wrap items-center gap-3">
@@ -258,13 +263,13 @@ export function ReleaseDetail() {
                       {formatEditionValue(release.format) || 'Unknown format'}
                     </Badge>
                     {release.packagingType && (
-                      <Badge variant="outline" className="border-white/10 bg-black/30 text-slate-200">
+                      <Badge variant="outline" className="border-border bg-background/75 text-muted-foreground">
                         <Package2 className="mr-1 h-3.5 w-3.5" />
                         {formatEditionValue(release.packagingType)}
                       </Badge>
                     )}
                     {film?.rating && (
-                      <Badge variant="outline" className="border-white/10 bg-black/30 text-slate-200">
+                      <Badge variant="outline" className="border-border bg-background/75 text-muted-foreground">
                         <Star className="mr-1 h-3.5 w-3.5" />
                         Rated {film.rating}
                       </Badge>
@@ -272,40 +277,36 @@ export function ReleaseDetail() {
                   </div>
 
                   <div className="space-y-3">
-                    <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Release archive</p>
+                    <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">Film</p>
                     <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-                      {film?.title || buildEditionLabel(release)}
+                      {filmTitle}
                     </h1>
-                    <p className="text-lg text-slate-300">
-                      {buildEditionLabel(release)}
+                    <p className="text-lg text-muted-foreground">
+                      {releaseLabel}
                     </p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-400">
-                      <span>{film?.producingCountry || release.country || 'Unknown country'}</span>
-                      <span>{film?.releaseYear ? String(film.releaseYear) : formatReleaseYear(release.releaseYear)}</span>
-                      <span>{release.verified ? 'Verified archive record' : 'Archive record pending verification'}</span>
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                      <span>{filmYear}</span>
+                      <span>{film?.rating ? `Rated ${film.rating}` : 'Rating not available'}</span>
                     </div>
                   </div>
 
-                  <p className="max-w-3xl text-base leading-7 text-slate-300">
+                  <p className="max-w-3xl text-base leading-7 text-muted-foreground">
                     {film?.description || 'Archive view for this physical edition, with its gallery, packaging details, barcode, and collection actions in one place.'}
                   </p>
 
                   <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Edition Type</p>
-                      <p className="mt-3 text-lg font-semibold text-slate-100">{buildEditionLabel(release)}</p>
+                    <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                      <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Film Title</p>
+                      <p className="mt-3 text-lg font-semibold text-foreground">{filmTitle}</p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Edition Country</p>
-                      <p className="mt-3 text-lg font-semibold text-slate-100">{release.country || 'Unknown'}</p>
+                    <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                      <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Film Year</p>
+                      <p className="mt-3 text-lg font-semibold text-foreground">{filmYear}</p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Edition Year</p>
-                      <p className="mt-3 text-lg font-semibold text-slate-100">{formatReleaseYear(release.releaseYear)}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Archive Status</p>
-                      <p className="mt-3 text-lg font-semibold text-slate-100">{release.verified ? 'Verified' : 'Pending'}</p>
+                    {/* Producing country intentionally hidden in this view. */}
+                    <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                      <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Film Rating</p>
+                      <p className="mt-3 text-lg font-semibold text-foreground">{film?.rating || 'Not available'}</p>
                     </div>
                   </div>
 
@@ -321,7 +322,7 @@ export function ReleaseDetail() {
                         Add edition to collection
                       </Button>
                     )}
-                    <Button asChild size="lg" variant="outline" className="border-white/10 bg-black/30 text-slate-100 hover:bg-black/45">
+                    <Button asChild size="lg" variant="outline" className="border-border bg-background/70 text-foreground hover:bg-secondary">
                       <Link to="/collection">Open collection</Link>
                     </Button>
                   </div>
@@ -330,8 +331,8 @@ export function ReleaseDetail() {
             </div>
 
             <div className="grid gap-0 lg:grid-cols-[minmax(320px,420px)_1fr]">
-              <div className="border-b border-white/10 bg-[radial-gradient(circle_at_top,rgba(193,18,31,0.14),transparent_38%),rgba(10,10,12,0.92)] p-6 lg:border-b-0 lg:border-r">
-                <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/40">
+              <div className="border-b border-border/80 bg-[radial-gradient(circle_at_top,rgba(200,181,154,0.16),transparent_38%),rgba(248,244,236,0.92)] p-6 lg:border-b-0 lg:border-r dark:bg-[radial-gradient(circle_at_top,rgba(200,181,154,0.1),transparent_34%),rgba(18,22,29,0.92)]">
+                <div className="overflow-hidden rounded-[1.5rem] border border-border/80 bg-background/70">
                   <div className="aspect-[3/4]">
                     {activePicture ? (
                       <ImageWithFallback
@@ -340,7 +341,7 @@ export function ReleaseDetail() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-slate-500">
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                         <ImageIcon className="h-12 w-12" />
                       </div>
                     )}
@@ -350,7 +351,7 @@ export function ReleaseDetail() {
                 <div className="mt-5 space-y-3">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold">Image gallery</h2>
-                    <span className="text-sm text-slate-400">{release.pictures.length} file{release.pictures.length === 1 ? '' : 's'}</span>
+                    <span className="text-sm text-muted-foreground">{release.pictures.length} file{release.pictures.length === 1 ? '' : 's'}</span>
                   </div>
 
                   {release.pictures.length > 0 ? (
@@ -365,11 +366,11 @@ export function ReleaseDetail() {
                             onClick={() => setActivePictureId(picture.id)}
                             className={`overflow-hidden rounded-xl border transition ${
                               isActive
-                                ? 'border-primary shadow-[0_0_0_1px_rgba(193,18,31,0.7)]'
-                                : 'border-white/10 hover:border-white/20'
+                                ? 'border-accent shadow-[0_0_0_1px_rgba(200,181,154,0.9)]'
+                                : 'border-border hover:border-accent/60'
                             }`}
                           >
-                            <div className="aspect-[3/4] bg-black/40">
+                            <div className="aspect-[3/4] bg-background/80">
                               <ImageWithFallback
                                 src={picture.url}
                                 alt={picture.id}
@@ -381,7 +382,7 @@ export function ReleaseDetail() {
                       })}
                     </div>
                   ) : (
-                    <div className="rounded-2xl border border-dashed border-white/10 px-4 py-6 text-center text-sm text-slate-400">
+                    <div className="rounded-2xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
                       No pictures were attached to this release.
                     </div>
                   )}
@@ -390,81 +391,117 @@ export function ReleaseDetail() {
 
               <div className="p-6 sm:p-8 lg:p-10">
                 <div className="flex flex-col gap-6">
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <div className="flex items-center gap-2 text-sm text-slate-400">
-                        <ScanLine className="h-4 w-4" />
-                        Barcode
-                      </div>
-                      <p className="mt-3 break-all text-lg font-semibold text-slate-100">{release.barcode || 'Not available'}</p>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm uppercase tracking-[0.24em] text-muted-foreground">Edition / Release</p>
+                      <h2 className="mt-2 text-2xl font-bold text-foreground">{releaseLabel}</h2>
+                      <p className="mt-2 text-sm text-muted-foreground">{releaseSummary}</p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <div className="flex items-center gap-2 text-sm text-slate-400">
-                        <Globe className="h-4 w-4" />
-                        Edition country
+
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                      <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Package2 className="h-4 w-4" />
+                          Edition type
+                        </div>
+                        <p className="mt-3 text-lg font-semibold text-foreground">{releaseLabel}</p>
                       </div>
-                      <p className="mt-3 text-lg font-semibold text-slate-100">{release.country || 'Unknown'}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <div className="flex items-center gap-2 text-sm text-slate-400">
-                        <Calendar className="h-4 w-4" />
-                        Edition year
+                      <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Globe className="h-4 w-4" />
+                          Edition country
+                        </div>
+                        <p className="mt-3 text-lg font-semibold text-foreground">{release.country || 'Unknown'}</p>
                       </div>
-                      <p className="mt-3 text-lg font-semibold text-slate-100">{formatReleaseYear(release.releaseYear)}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <div className="flex items-center gap-2 text-sm text-slate-400">
-                        <BadgeCheck className="h-4 w-4" />
-                        Picture count
+                      <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="h-4 w-4" />
+                          Edition year
+                        </div>
+                        <p className="mt-3 text-lg font-semibold text-foreground">{formatReleaseYear(release.releaseYear)}</p>
                       </div>
-                      <p className="mt-3 text-lg font-semibold text-slate-100">{release.pictures.length}</p>
+                      <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <ShieldCheck className="h-4 w-4" />
+                          Archive status
+                        </div>
+                        <p className="mt-3 text-lg font-semibold text-foreground">{release.verified ? 'Verified' : 'Pending'}</p>
+                      </div>
                     </div>
                   </div>
 
-                  <Separator className="bg-white/10" />
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <ScanLine className="h-4 w-4" />
+                        Barcode
+                      </div>
+                      <p className="mt-3 break-all text-lg font-semibold text-foreground">{release.barcode || 'Not available'}</p>
+                    </div>
+                    <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Globe className="h-4 w-4" />
+                        Format
+                      </div>
+                      <p className="mt-3 text-lg font-semibold text-foreground">{formatEditionValue(release.format) || 'Not available'}</p>
+                    </div>
+                    <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        Packaging type
+                      </div>
+                      <p className="mt-3 text-lg font-semibold text-foreground">{formatEditionValue(release.packagingType) || 'Not available'}</p>
+                    </div>
+                    <div className="rounded-2xl border border-border/80 bg-background/80 p-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BadgeCheck className="h-4 w-4" />
+                        Picture count
+                      </div>
+                      <p className="mt-3 text-lg font-semibold text-foreground">{release.pictures.length}</p>
+                    </div>
+                  </div>
+
+                  <Separator className="bg-border" />
 
                   <div className="grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
                     <div className="space-y-4">
                       <h2 className="text-xl font-semibold">Release Notes</h2>
-                      <div className="rounded-2xl border border-white/10 bg-black/30 p-5 text-slate-300">
+                      <div className="rounded-2xl border border-border/80 bg-background/80 p-5 text-muted-foreground">
                         {release.notes ? (
                           <p className="leading-7">{release.notes}</p>
                         ) : (
-                          <p className="text-slate-500">No release notes were provided for this edition.</p>
+                          <p className="text-muted-foreground">No release notes were provided for this edition.</p>
                         )}
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       <h2 className="text-xl font-semibold">Data Snapshot</h2>
-                      <div className="rounded-2xl border border-white/10 bg-black/30 p-5">
+                      <div className="rounded-2xl border border-border/80 bg-background/80 p-5">
                         <dl className="space-y-4 text-sm">
                           <div className="flex items-start justify-between gap-4">
-                            <dt className="text-slate-400">Film title</dt>
-                            <dd className="text-right font-medium text-slate-100">{film?.title || 'Not available'}</dd>
+                            <dt className="text-muted-foreground">Film title</dt>
+                            <dd className="text-right font-medium text-foreground">{film?.title || 'Not available'}</dd>
                           </div>
                           <div className="flex items-start justify-between gap-4">
-                            <dt className="text-slate-400">Film year</dt>
-                            <dd className="font-medium text-slate-100">
+                            <dt className="text-muted-foreground">Film year</dt>
+                            <dd className="font-medium text-foreground">
                               {film?.releaseYear ? String(film.releaseYear) : 'Not available'}
                             </dd>
                           </div>
+                          {/* Producing country intentionally hidden in this view. */}
                           <div className="flex items-start justify-between gap-4">
-                            <dt className="text-slate-400">Producing country</dt>
-                            <dd className="font-medium text-slate-100">{film?.producingCountry || 'Not available'}</dd>
+                            <dt className="text-muted-foreground">Rating</dt>
+                            <dd className="font-medium text-foreground">{film?.rating || 'Not available'}</dd>
                           </div>
                           <div className="flex items-start justify-between gap-4">
-                            <dt className="text-slate-400">Rating</dt>
-                            <dd className="font-medium text-slate-100">{film?.rating || 'Not available'}</dd>
-                          </div>
-                          <div className="flex items-start justify-between gap-4">
-                            <dt className="text-slate-400">Verification</dt>
-                            <dd className="font-medium text-slate-100">{release.verified ? 'Verified' : 'Not verified'}</dd>
+                            <dt className="text-muted-foreground">Verification</dt>
+                            <dd className="font-medium text-foreground">{release.verified ? 'Verified' : 'Not verified'}</dd>
                           </div>
                           {activePicture && (
                             <div className="flex items-start justify-between gap-4">
-                              <dt className="text-slate-400">Active picture uploaded</dt>
-                              <dd className="text-right font-medium text-slate-100">{formatUploadedAt(activePicture.uploadedAt)}</dd>
+                              <dt className="text-muted-foreground">Active picture uploaded</dt>
+                              <dd className="text-right font-medium text-foreground">{formatUploadedAt(activePicture.uploadedAt)}</dd>
                             </div>
                           )}
                         </dl>
@@ -486,7 +523,7 @@ export function ReleaseDetail() {
           }
         }}
         title="Add Item To Collection"
-        description="Create the collection item using the real fields exposed by mv-film-service for this edition."
+        description="Add this release to your personal collection."
         submitLabel="Create item"
         initialValues={getDefaultCollectionItemFormValues()}
         onSubmit={handleAddToCollection}

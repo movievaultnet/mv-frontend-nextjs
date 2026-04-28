@@ -51,7 +51,7 @@ export function AIArticleDetail() {
     <>
       {isAuthenticated ? <Navbar /> : <LandingNavbar />}
       <div className="min-h-screen bg-background">
-        <div className="border-b border-border bg-[linear-gradient(135deg,rgba(193,18,31,0.12),rgba(9,9,10,0.96)_42%,rgba(9,9,10,1))]">
+        <div className="border-b border-border bg-[linear-gradient(135deg,rgba(200,181,154,0.28),rgba(251,248,242,0.96)_42%,rgba(242,238,231,1))] dark:bg-[linear-gradient(135deg,rgba(200,181,154,0.14),rgba(23,27,34,0.98)_42%,rgba(14,17,22,1))]">
           <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
             <Button asChild variant="ghost" className="mb-4 -ml-4">
               <Link to="/ai-content">
@@ -72,7 +72,7 @@ export function AIArticleDetail() {
             ) : (
               <div className="space-y-6">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+                  <Badge variant="outline" className="border-accent/40 bg-accent/16 text-primary dark:text-accent">
                     {article.model}
                   </Badge>
                   <Badge variant="secondary">{article.readTime} min read</Badge>

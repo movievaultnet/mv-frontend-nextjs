@@ -21,8 +21,10 @@ interface FilmDetailDto {
   id: string;
   title: string;
   description: string;
-  releaseYear: number;
-  producingCountry: string;
+  releaseYear?: number;
+  release_year?: number;
+  producingCountry?: string;
+  producing_country?: string;
   rating: string;
   poster: string;
 }
@@ -259,8 +261,8 @@ function mapFilmDetail(item: FilmDetailDto): FilmDetail {
     id: item.id,
     title: item.title,
     description: item.description,
-    releaseYear: item.releaseYear,
-    producingCountry: item.producingCountry,
+    releaseYear: item.releaseYear ?? item.release_year ?? 0,
+    producingCountry: item.producingCountry ?? item.producing_country ?? '',
     rating: item.rating,
     poster: item.poster,
   };

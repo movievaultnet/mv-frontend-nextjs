@@ -368,12 +368,12 @@ export function AddRelease() {
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm text-primary">
                 <PlusCircle className="h-4 w-4" />
-                Add release workflow
+                Add a release
               </div>
               <div>
                 <h1 className="text-3xl font-bold">Add a new release</h1>
                 <p className="mt-2 max-w-3xl text-muted-foreground">
-                  Search the film in TMDB, complete the release metadata, then the page will create the film in the backend and immediately attach the release to it.
+                  Find the film, enter the edition details, and add it to the archive with its images and release information.
                 </p>
               </div>
             </div>
@@ -381,12 +381,12 @@ export function AddRelease() {
         </div>
 
         <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(44,47,58,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
             <div className="space-y-5">
               <div>
                 <h2 className="text-xl font-semibold">1. Search the film</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Type at least two characters. Results are fetched progressively from `/api/catalog/tmdb/search`.
+                  Start typing the title to find the film you want to work with.
                 </p>
               </div>
 
@@ -412,14 +412,14 @@ export function AddRelease() {
                 </div>
 
                 {isOpen && (query.trim().length >= 2 || error) && (
-                  <div className="absolute z-30 mt-2 max-h-96 w-full overflow-hidden rounded-2xl border border-border bg-popover shadow-2xl shadow-black/20">
+                  <div className="absolute z-30 mt-2 max-h-96 w-full overflow-hidden rounded-2xl border border-border bg-popover shadow-[0_24px_60px_rgba(44,47,58,0.16)] dark:shadow-[0_28px_70px_rgba(0,0,0,0.34)]">
                     <div className="max-h-96 overflow-y-auto p-2">
                       {error ? (
                         <div className="rounded-xl px-4 py-6 text-sm text-destructive">{error}</div>
                       ) : loading && results.length === 0 ? (
                         <div className="flex items-center gap-3 rounded-xl px-4 py-6 text-sm text-muted-foreground">
                           <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                          Searching TMDB...
+                          Searching titles...
                         </div>
                       ) : results.length > 0 ? (
                         <div className="space-y-2">
@@ -461,7 +461,7 @@ export function AddRelease() {
             </div>
           </section>
 
-          <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10">
+          <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(44,47,58,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">2. Selected film</h2>
               {selectedMovie ? (
@@ -493,24 +493,24 @@ export function AddRelease() {
                     <p className="leading-7 text-muted-foreground">{selectedMovie.overview}</p>
 
                     <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground">
-                      The backend will create this film idempotently using its TMDB id, then the resulting internal film id will be used to create the release.
+                      Review the selected title before moving on to the edition details.
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed border-border px-5 py-8 text-sm text-muted-foreground">
-                  Search and choose a film above to continue with the release creation flow.
+                  Choose a film above to continue with the release entry.
                 </div>
               )}
             </div>
           </section>
 
-          <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-lg shadow-black/10">
+          <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-[0_18px_40px_rgba(44,47,58,0.08)] dark:shadow-[0_22px_48px_rgba(0,0,0,0.22)]">
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold">3. Release metadata</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Complete the release information. `filmId` is not editable here because it will come from the backend after the film is created or resolved idempotently.
+                  Complete the edition details as they appear on your copy.
                 </p>
               </div>
 
@@ -759,7 +759,7 @@ export function AddRelease() {
 
                 <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-background/60 p-4">
                   <p className="text-sm text-muted-foreground">
-                    Submit flow: create film from TMDB data, create the release with the returned `filmId`, upload every selected image with the returned `editionId`, then assign the chosen image as the edition cover.
+                    Check the details one last time before adding the release to the archive.
                   </p>
                   <div className="flex flex-wrap gap-3">
                     {pendingPictureEditionId && selectedImages.length > 0 && coverImageId && (

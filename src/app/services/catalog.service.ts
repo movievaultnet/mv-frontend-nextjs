@@ -24,7 +24,7 @@ interface EditionPictureDto {
 }
 
 interface EditionReleaseYearDto {
-  value: number;
+  value: number | string;
   leap: boolean;
 }
 
@@ -35,7 +35,7 @@ interface EditionDetailDto {
   barcode: string;
   country: string;
   format: string;
-  release_year: EditionReleaseYearDto;
+  release_year: EditionReleaseYearDto | number | string | null;
   packaging_type: string;
   verified: boolean;
   cover_picture: string | null;
@@ -347,6 +347,42 @@ function mapEditionPictureUrl(slug: string, pictureId: string) {
   return buildApiUrl(`/static/images/${encodeURIComponent(normalizedSlug)}/${encodeURIComponent(normalizedPictureId)}.jpeg`);
 }
 
+function parseEditionReleaseYear(value: EditionReleaseYearDto | number | string | null | undefined) {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const normalizedValue = value.trim();
+
+    if (/^\d{4}$/.test(normalizedValue)) {
+      return Number(normalizedValue);
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)) {
+      return Number(normalizedValue.slice(0, 4));
+    }
+  }
+
+  if (value && typeof value.value === 'number') {
+    return value.value;
+  }
+
+  if (value && typeof value.value === 'string') {
+    const normalizedValue = value.value.trim();
+
+    if (/^\d{4}$/.test(normalizedValue)) {
+      return Number(normalizedValue);
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)) {
+      return Number(normalizedValue.slice(0, 4));
+    }
+  }
+
+  return 0;
+}
+
 function mapEditionDetail(item: EditionDetailDto): EditionDetail {
   persistEditionIdentity(item.slug, item.id);
 
@@ -368,7 +404,7 @@ function mapEditionDetail(item: EditionDetailDto): EditionDetail {
     barcode: item.barcode,
     country: item.country,
     format: item.format,
-    releaseYear: item.release_year?.value ?? 0,
+    releaseYear: parseEditionReleaseYear(item.release_year),
     packagingType: item.packaging_type,
     verified: item.verified,
     coverPictureId,
@@ -379,6 +415,11 @@ function mapEditionDetail(item: EditionDetailDto): EditionDetail {
 }
 
 function mapTmdbSearchMovie(movie: TmdbSearchMovieDto): TmdbSearchMovie {
+  const normalizedReleaseDate = movie.release_date.trim();
+  const releaseYear = /^\d{4}-\d{2}-\d{2}$/.test(normalizedReleaseDate)
+    ? normalizedReleaseDate.slice(0, 4)
+    : 'TBA';
+
   return {
     id: String(movie.id),
     tmdbId: movie.id,
@@ -386,8 +427,8 @@ function mapTmdbSearchMovie(movie: TmdbSearchMovieDto): TmdbSearchMovie {
     overview: movie.overview,
     posterPath: movie.poster_path,
     posterUrl: movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : '',
-    releaseDate: movie.release_date,
-    releaseYear: movie.release_date ? movie.release_date.slice(0, 4) : 'TBA',
+    releaseDate: normalizedReleaseDate,
+    releaseYear,
     rating: movie.vote_average,
   };
 }

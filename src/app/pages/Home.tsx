@@ -28,8 +28,8 @@ function DiscoverShowcaseCard({ movie }: { movie: LandingMovie }) {
             alt={movie.title}
             className="h-full w-full object-cover"
           />
-          <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-black/80 px-2.5 py-1 text-xs text-white backdrop-blur">
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+          <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full border border-border/70 bg-card/90 px-2.5 py-1 text-xs text-foreground backdrop-blur">
+            <Star className="h-3 w-3 fill-accent text-accent" />
             {movie.rating.toFixed(1)}
           </div>
         </div>
@@ -49,7 +49,7 @@ function DiscoverShowcaseCard({ movie }: { movie: LandingMovie }) {
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
             <span>Release date: {movie.releaseDate || 'TBA'}</span>
-            <span>TMDB score: {movie.rating.toFixed(1)}</span>
+            <span>Rating: {movie.rating.toFixed(1)}</span>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -113,8 +113,8 @@ export function Home() {
       <Navbar />
       <div className="min-h-screen bg-background">
         {/* Hero Section */}
-        <div className="relative overflow-hidden border-b border-border bg-[linear-gradient(135deg,rgba(193,18,31,0.12),rgba(9,9,10,0.96)_45%,rgba(9,9,10,1))]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(140,106,67,0.18),transparent_42%)]" />
+        <div className="relative overflow-hidden border-b border-border bg-[linear-gradient(135deg,rgba(200,181,154,0.28),rgba(251,248,242,0.96)_45%,rgba(242,238,231,1))] dark:bg-[linear-gradient(135deg,rgba(200,181,154,0.12),rgba(23,27,34,0.98)_45%,rgba(14,17,22,1))]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(107,111,122,0.12),transparent_42%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(200,181,154,0.1),transparent_40%)]" />
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary">
@@ -183,7 +183,7 @@ export function Home() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold">Discover Showcase</h2>
-                <p className="text-muted-foreground mt-1">Live titles coming from the public discover endpoint</p>
+                <p className="text-muted-foreground mt-1">A rotating selection of notable films to explore next.</p>
               </div>
               <Button asChild variant="outline">
                 <Link to="/catalog">
@@ -206,7 +206,7 @@ export function Home() {
               </Carousel>
             ) : (
               <div className="rounded-2xl border border-border bg-card p-8 text-center text-muted-foreground">
-                The discover feed is empty right now.
+                There is nothing to show here right now.
               </div>
             )}
           </section>
@@ -236,7 +236,7 @@ export function Home() {
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Link 
               to="/catalog" 
-              className="group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/20 to-primary/5 p-8 transition-all hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-accent/24 to-card p-8 transition-all hover:border-accent/60 hover:shadow-xl hover:shadow-primary/10 dark:from-accent/10 dark:to-card"
             >
               <div className="relative z-10">
                 <FilmIcon className="h-12 w-12 text-primary mb-4" />
@@ -253,15 +253,15 @@ export function Home() {
 
             <Link 
               to="/ranking" 
-              className="group relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(135deg,rgba(140,106,67,0.22),rgba(111,29,27,0.08))] p-8 transition-all hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-[linear-gradient(135deg,rgba(200,181,154,0.28),rgba(107,111,122,0.08))] p-8 transition-all hover:border-accent/60 hover:shadow-xl hover:shadow-primary/10 dark:bg-[linear-gradient(135deg,rgba(200,181,154,0.12),rgba(107,111,122,0.12))]"
             >
               <div className="relative z-10">
-                <TrendingUp className="mb-4 h-12 w-12 text-[#8c6a43]" />
+                <TrendingUp className="mb-4 h-12 w-12 text-accent" />
                 <h3 className="text-xl font-bold mb-2">Leaderboard</h3>
                 <p className="text-muted-foreground">
                   See how you rank against other movie enthusiasts worldwide
                 </p>
-                <div className="mt-4 flex items-center gap-2 text-blue-500 font-medium">
+                <div className="mt-4 flex items-center gap-2 font-medium text-primary">
                   View rankings
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>

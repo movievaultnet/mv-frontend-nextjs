@@ -249,7 +249,7 @@ export function Collection() {
           }
         }}
         title="Edit Collection Item"
-        description="Update the collection metadata stored in mv-film-service for this owned edition."
+        description="Update the details for this copy in your collection."
         submitLabel="Save changes"
         initialValues={itemFormValues}
         onSubmit={handleEditSubmit}

@@ -24,9 +24,9 @@ export function RankingCard({ entry, highlight = false }: RankingCardProps) {
   };
 
   const getRankColor = () => {
-    if (entry.rank === 1) return 'text-yellow-500';
-    if (entry.rank === 2) return 'text-gray-400';
-    if (entry.rank === 3) return 'text-amber-700';
+    if (entry.rank === 1) return 'text-accent';
+    if (entry.rank === 2) return 'text-muted-foreground';
+    if (entry.rank === 3) return 'text-primary';
     return 'text-muted-foreground';
   };
 

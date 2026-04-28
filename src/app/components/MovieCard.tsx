@@ -19,12 +19,12 @@ export function MovieCard({ movie }: MovieCardProps) {
             alt={movie.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 opacity-0 transition-opacity group-hover:opacity-100" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/0 to-background/0 opacity-0 transition-opacity group-hover:opacity-100" />
           
           {/* Rating Badge */}
-          <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-black/80 px-2 py-1 backdrop-blur">
-            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-            <span className="text-xs font-medium text-white">{movie.rating.toFixed(1)}</span>
+          <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full border border-border/70 bg-card/92 px-2 py-1 backdrop-blur">
+            <Star className="h-3 w-3 fill-accent text-accent" />
+            <span className="text-xs font-medium text-foreground">{movie.rating.toFixed(1)}</span>
           </div>
         </div>
 

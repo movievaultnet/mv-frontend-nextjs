@@ -53,12 +53,6 @@ export interface LandingPayload {
   heroMovies: LandingMovie[];
   spotlightMovies: LandingMovie[];
   collections: LandingCollection[];
-  stats: {
-    currentPage: number;
-    totalPages: number;
-    totalResults: string;
-    averageRating: string;
-  };
 }
 
 const DISCOVER_FILMS_ENDPOINT = '/api/catalog/films/tmdb/discover';
@@ -87,6 +81,48 @@ function mapLandingMovie(movie: DiscoverFilmDto): LandingMovie {
     rating: movie.vote_average,
     trailerKey: movie.trailer_key,
   };
+}
+
+function getReleaseTimestamp(movie: LandingMovie) {
+  if (!movie.releaseDate) {
+    return 0;
+  }
+
+  const parsedDate = new Date(movie.releaseDate);
+  return Number.isNaN(parsedDate.getTime()) ? 0 : parsedDate.getTime();
+}
+
+function buildLandingCollections(movies: LandingMovie[]): LandingCollection[] {
+  const freshPicks = [...movies]
+    .sort((left, right) => getReleaseTimestamp(right) - getReleaseTimestamp(left) || right.rating - left.rating)
+    .slice(0, 4);
+
+  const freshPickIds = new Set(freshPicks.map((movie) => movie.id));
+  const worthALook = [...movies]
+    .filter((movie) => !freshPickIds.has(movie.id))
+    .sort((left, right) => right.rating - left.rating || getReleaseTimestamp(right) - getReleaseTimestamp(left))
+    .slice(0, 4);
+
+  return [
+    {
+      id: 'discover-grid',
+      title: 'Discover Feed',
+      description: 'The first page of the TMDB discover feed, sorted by popularity.',
+      movies: movies.slice(0, 6),
+    },
+    {
+      id: 'fresh-picks',
+      title: 'Fresh Picks',
+      description: 'The most recent releases from the current discover feed.',
+      movies: freshPicks,
+    },
+    {
+      id: 'worth-a-look',
+      title: 'Worth A Look',
+      description: 'The strongest-rated titles from the same feed, excluding the fresh picks.',
+      movies: worthALook,
+    },
+  ];
 }
 
 async function fetchDiscoverFilms(request: DiscoverFilmsRequest = DEFAULT_DISCOVER_REQUEST) {
@@ -129,38 +165,11 @@ export const landingService = {
     const payload = await fetchDiscoverFilms(DEFAULT_DISCOVER_REQUEST);
 
     const movies = payload.data.results.map(mapLandingMovie);
-    const averageRating =
-      movies.reduce((acc, movie) => acc + movie.rating, 0) / Math.max(movies.length, 1);
 
     return {
       heroMovies: movies.slice(0, 4),
       spotlightMovies: movies.slice(0, 2),
-      collections: [
-        {
-          id: 'discover-grid',
-          title: 'Discover Feed',
-          description: 'The first page of the TMDB discover feed, sorted by popularity.',
-          movies: movies.slice(0, 6),
-        },
-        {
-          id: 'fresh-picks',
-          title: 'Fresh Picks',
-          description: 'A tighter subset for the editorial part of the landing.',
-          movies: movies.slice(2, 6),
-        },
-        {
-          id: 'worth-a-look',
-          title: 'Worth A Look',
-          description: 'Additional titles surfaced from the same discover request.',
-          movies: movies.slice(6, 10),
-        },
-      ],
-      stats: {
-        currentPage: payload.data.page,
-        totalPages: payload.data.total_pages,
-        totalResults: payload.data.total_results.toLocaleString('en-US'),
-        averageRating: averageRating.toFixed(1),
-      },
+      collections: buildLandingCollections(movies),
     };
   },
 };

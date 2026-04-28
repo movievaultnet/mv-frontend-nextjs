@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Filter, Loader2 } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { Navbar } from '../components/Navbar';
 import { SearchBar } from '../components/SearchBar';
 import { CatalogSearchCard } from '../components/CatalogSearchCard';
@@ -8,11 +8,13 @@ import { Button } from '../components/ui/button';
 import { catalogService, type CatalogSearchResult } from '../services/catalog.service';
 
 export function Catalog() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchResult, setSearchResult] = useState<CatalogSearchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeQuery, setActiveQuery] = useState('');
   const [error, setError] = useState('');
+  const routeQuery = searchParams.get('query')?.trim() ?? '';
 
   const runSearch = async (query: string, page: number = 1) => {
     setLoading(true);
@@ -31,15 +33,33 @@ export function Catalog() {
     }
   };
 
+  useEffect(() => {
+    setSearchQuery(routeQuery);
+
+    if (!routeQuery) {
+      setActiveQuery('');
+      setSearchResult(null);
+      setError('');
+      return;
+    }
+
+    void runSearch(routeQuery, 0);
+  }, [routeQuery]);
+
   const handleSearch = (query: string) => {
-    runSearch(query, 0);
+    const normalizedQuery = query.trim();
+
+    if (!normalizedQuery) {
+      setSearchParams({});
+      return;
+    }
+
+    setSearchParams({ query: normalizedQuery });
   };
 
   const clearSearch = () => {
     setSearchQuery('');
-    setActiveQuery('');
-    setSearchResult(null);
-    setError('');
+    setSearchParams({});
   };
 
   return (
@@ -52,7 +72,7 @@ export function Catalog() {
               <div>
                 <h1 className="text-3xl font-bold">Movie Catalog</h1>
                 <p className="mt-1 text-muted-foreground">
-                  Search the indexed catalog through the backend Elastic endpoint
+                  Search the archive by title, release, or barcode.
                 </p>
               </div>
 
@@ -61,7 +81,7 @@ export function Catalog() {
                   <div>
                     <p className="font-medium text-foreground">Can&apos;t find the release you need?</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Search existing releases here, or start the release creation flow from a TMDB film search.
+                      If it is not listed yet, add a new release to the catalog.
                     </p>
                   </div>
                   <Button asChild>
@@ -95,7 +115,7 @@ export function Catalog() {
                   </>
                 ) : (
                   <div className="rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
-                    Use the search bar to query `/api/catalog/elastic/search`
+                    Search by film title, edition title, or barcode
                   </div>
                 )}
               </div>
@@ -164,7 +184,7 @@ export function Catalog() {
               <Filter className="mb-4 h-16 w-16 text-muted-foreground" />
               <h3 className="mb-2 text-xl font-semibold">Search the catalog</h3>
               <p className="mb-4 text-muted-foreground">
-                Start with a title query and the page will call the backend Elastic search endpoint.
+                Start with a title, label, or barcode to explore the catalog.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Button onClick={() => handleSearch(searchQuery)} disabled={!searchQuery.trim()}>

@@ -103,7 +103,7 @@ export function MovieDetail() {
                       <span>{movie.duration} minutes</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
+                      <Star className="h-5 w-5 fill-accent text-accent" />
                       <span className="font-semibold">{movie.rating.toFixed(1)}/10</span>
                     </div>
                   </div>
@@ -148,7 +148,7 @@ export function MovieDetail() {
                 </div>
 
                 <p className="text-sm text-muted-foreground">
-                  Collection items are now owned as backend edition records, so collection actions happen from release pages instead of abstract movie records.
+                  Collection and ownership details are handled from individual release pages.
                 </p>
               </div>
             </div>

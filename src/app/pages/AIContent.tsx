@@ -36,7 +36,7 @@ export function AIContent() {
   const getModelColor = (model: string) => {
     switch (model) {
       case 'Gemini 2.5 Flash':
-        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+        return 'border-accent/40 bg-accent/16 text-primary dark:text-accent';
       default:
         return 'bg-primary/10 text-primary border-primary/20';
     }
@@ -48,7 +48,7 @@ export function AIContent() {
     <>
       {isAuthenticated ? <Navbar /> : <LandingNavbar />}
       <div className="min-h-screen bg-background">
-        <div className="border-b border-border bg-[linear-gradient(135deg,rgba(193,18,31,0.12),rgba(9,9,10,0.96)_42%,rgba(9,9,10,1))]">
+        <div className="border-b border-border bg-[linear-gradient(135deg,rgba(200,181,154,0.28),rgba(251,248,242,0.96)_42%,rgba(242,238,231,1))] dark:bg-[linear-gradient(135deg,rgba(200,181,154,0.14),rgba(23,27,34,0.98)_42%,rgba(14,17,22,1))]">
           <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
             <div className="mb-4 flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
@@ -66,7 +66,7 @@ export function AIContent() {
               <div className="flex items-start gap-3">
                 <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
                 <div className="text-sm text-foreground">
-                  New edition creation events trigger article generation in the IA service. This page lists the real posts stored by that backend.
+                  A curated space for reviews, editorials, and long-form writing inspired by the catalog.
                 </div>
               </div>
             </div>

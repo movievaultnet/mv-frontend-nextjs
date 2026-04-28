@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Settings as SettingsIcon, User, Mail, Shield, LogOut, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Settings as SettingsIcon, User, Mail, Shield, LogOut, CheckCircle2, XCircle, Loader2, Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { authService } from '../services/auth.service';
 import { Navbar } from '../components/Navbar';
 import { Button } from '../components/ui/button';
@@ -9,10 +10,12 @@ import { Label } from '../components/ui/label';
 import { Separator } from '../components/ui/separator';
 import { Badge } from '../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { ThemeModeToggle } from '../components/ThemeModeToggle';
 
 export function Settings() {
   const navigate = useNavigate();
   const user = authService.getCurrentUser();
+  const { theme, resolvedTheme } = useTheme();
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState(user?.emailVerified || false);
 
@@ -37,6 +40,13 @@ export function Settings() {
     navigate('/login');
     return null;
   }
+
+  const activeThemeLabel =
+    theme === 'system'
+      ? `Following system preference${resolvedTheme ? ` (${resolvedTheme})` : ''}`
+      : resolvedTheme === 'dark'
+        ? 'Dark archive mode active'
+        : 'Light archive mode active';
 
   return (
     <>
@@ -155,6 +165,44 @@ export function Settings() {
                   )}
                 </Button>
               )}
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border bg-card p-6 space-y-6">
+            <div className="flex items-center gap-2">
+              <Monitor className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">Appearance</h2>
+            </div>
+
+            <div className="flex flex-col gap-5 rounded-2xl border border-border bg-secondary/20 p-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-3">
+                <div>
+                  <p className="font-medium">Theme Preference</p>
+                  <p className="text-sm text-muted-foreground">
+                    Choose the archive mood that fits your workspace, or let MovieVault follow your system.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <Badge variant="outline" className="gap-1.5">
+                    <Sun className="h-3.5 w-3.5" />
+                    Light
+                  </Badge>
+                  <Badge variant="outline" className="gap-1.5">
+                    <Moon className="h-3.5 w-3.5" />
+                    Dark
+                  </Badge>
+                  <Badge variant="outline" className="gap-1.5">
+                    <Monitor className="h-3.5 w-3.5" />
+                    System
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start gap-3 lg:items-end">
+                <ThemeModeToggle compact={false} />
+                <p className="text-xs text-muted-foreground">{activeThemeLabel}</p>
+              </div>
             </div>
           </section>
 
